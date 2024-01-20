@@ -33,6 +33,7 @@ const registerUser = asyncHandler(async (req, res) => {
     // check for user creation
     // return res
     const { fullname, username, email, password } = req.body;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{5,}$/;
     if ([fullname, username, email, password].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "All Fields Are Required");
     }

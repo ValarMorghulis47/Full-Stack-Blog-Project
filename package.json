@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "project made for learning purpose",
   "type": "module",
-  "main": "Backend/index.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "nodemon -r dotenv/config --experimental-json-modules Backend/index.js"
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   },
   "author": "valarmorghulis",
   "license": "ISC",
