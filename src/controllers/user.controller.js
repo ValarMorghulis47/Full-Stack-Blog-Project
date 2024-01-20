@@ -291,69 +291,48 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     )
 })
 
-const getUserChannelProfile = asyncHandler(async (req, res) => {
-    const { username } = req.params;
-    if (!username?.trim()) {
-        throw new ApiError(410, "Username Is Missing");
+const getUserProfile = asyncHandler(async (req, res) => {
+    const { userId } = req.params;
+    if (!userId) {
+        throw new ApiError(410, "UserId Is Missing");
     }
-    const channel = await User.aggregate([
+    const Profile = await User.aggregate([
         {
             $match: {
-                username: username?.toLowerCase()
+                _id: new mongoose.Types.ObjectId(userId)
             },
         },
         {
             $lookup: {
-                from: "subscriptions",
-                localField: "_id",
-                foreignField: "channel",
-                as: "subscribers"
+              from: "posts",
+              localField: "_id",
+              foreignField: "author",
+              as: "userDetails"
             }
-        },
-        {
-            $lookup: {
-                from: "subscriptions",
-                localField: "_id",
-                foreignField: "subscriber",
-                as: "subscribedTo"
-            }
-        },
-        {
+          },
+          {
             $addFields: {
-                subscribersCount: {
-                    $size: "$subscribers"
-                },
-                channelssubscribedToCount: {
-                    $size: "$subscribedTo"
-                },
-                isSubcribed: {
-                    $cond: {
-                        if: { $in: [req.user?._id, "$subscribers.subscriber"] },
-                        then: true,
-                        else: false
-                    }
-                }
+              TotalPosts: {
+                $size: "$userDetails"
+              }
             }
-        },
-        {
+          },
+          {
             $project: {
-                email: 1,
-                username: 1,
-                fullname: 1,
-                avatar: 1,
-                coverimage: 1,
-                subscribersCount: 1,
-                channelssubscribedToCount: 1,
-                isSubcribed: 1
+              TotalPosts:1,
+              fullname:1,
+              avatar:1,
+              coverimage:1,
+              username:1,
+              email:1,
             }
-        }
+          }
     ])
-    console.log(`The channel profile is:  ${channel}`);
-    if (!channel?.length) {
-        throw new ApiError(404, "Channel Not Found");
+    if (!Profile?.length) {
+        throw new ApiError(404, "Profile Not Found");
     }
     return res.status(200).json(
-        new ApiResponse(200, channel[0], "Channel Retrieved Successfully")
+        new ApiResponse(200, Profile[0], "Profile Retrieved Successfully")
     )
 })
 
@@ -434,4 +413,4 @@ const resetPassword = asyncHandler(async (req, res) => {
     )
 });
 
-export { registerUser, loginUser, logoutUser, refereshAccessToken, changeCurrentPassword, getCurrentUser, upDateUserDetails, updateUserAvatar, updateUserCoverImage, getUserChannelProfile, deleteUserAccount, forgotPassword, resetPassword };
+export { registerUser, loginUser, logoutUser, refereshAccessToken, changeCurrentPassword, getCurrentUser, upDateUserDetails, updateUserAvatar, updateUserCoverImage, getUserProfile, deleteUserAccount, forgotPassword, resetPassword };
