@@ -8,5 +8,4 @@ const storage = multer.diskStorage({
       cb(null, file.fieldname)     //we wrote this extra option for adding a unique suffix at the end of the file name
     }
   })
-console.log(storage.destination);
 export const upload = multer({ storage: storage })
