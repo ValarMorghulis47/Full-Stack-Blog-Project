@@ -37,6 +37,9 @@ const registerUser = asyncHandler(async (req, res) => {
     if ([fullname, username, email, password].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "All Fields Are Required");
     }
+    if (!passwordRegex.test(password)){
+        throw new ApiError(400, "Password must be at least 5 characters long and contain at least one number, one uppercase letter and one lowercase letter");
+    }
     if (!email.includes('@')) {
         throw new ApiError(400, "@sign is missing in the email field");
     }
