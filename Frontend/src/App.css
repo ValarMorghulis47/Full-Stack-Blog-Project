@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Kalnia&display=swap');
+
+#root{
+    font-family: 'Kalnia', serif;
+}
+
+.loading::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.8); /* You can adjust the background color and opacity */
+    backdrop-filter: blur(5px); /* Adjust the blur amount */
+    z-index: 50; /* Set a high z-index to ensure it's on top */
+  }
+ .spinner{
+    z-index: 60;
+ } 
