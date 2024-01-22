@@ -1,48 +1,62 @@
-import React, {useState} from 'react'
-import {Link, useNavigate} from 'react-router-dom'
-import { login as authLogin} from '../store/authSlice'
-import {postdata} from '../store/postSlice'
-import {Button, Input, Logo} from "./index"
-import {useDispatch} from "react-redux"
-import authService from "../appwrite/auth"
-import {useForm} from "react-hook-form"
-import databaseService from "../appwrite/databaseconfig"
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { login as authLogin } from '../store/authSlice'
+import { postdata } from '../store/postSlice'
+import { Button, Input, Logo } from "./index"
+import { useDispatch } from "react-redux"
+import { useForm } from "react-hook-form"
 function Login() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const {register, handleSubmit} = useForm()
+    const { register, handleSubmit } = useForm()
     const [error, setError] = useState("")
 
-    const login = async(data) => {
+    const login = async (data) => {
         setError("")
         try {
-            const session = await authService.login({...data})
-            if (session) {
-                const userData = await authService.getCurrentUser()
-                const postData= await databaseService.getPosts(userData.$id)
-                if(userData) {
-                    dispatch(authLogin({ userData: userData}))
-                    dispatch(postdata({ postData: postData }))
-                }
-               navigate("/")
+            console.log(data);
+            const formData = new FormData();
+
+            // Append JSON data
+            formData.append('email', data.email);
+            formData.append('password', data.password);
+            const userData = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/users/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+            
+            if (!userData.ok) {
+                console.error("Server Error:", userData.status, await userData.text());
+                setError("An error occurred during login. Please try again.");
+                return;
             }
+            
+            const jsonData = await userData.json(); // Parse the response body as JSON
+            console.log("Loggi Succes", jsonData);
+            console.log("Cookies: ", document.cookie);
+            dispatch(authLogin(jsonData.data.user)); // Dispatch the action with the parsed JSON data
+            navigate("/");
+            
         } catch (error) {
             setError(error.message)
         }
     }
 
-  return (
-    <div
-    className='flex items-center justify-center w-full'
-    >
-        <div className={`mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10`}>
-        <div className="mb-2 flex justify-center">
+    return (
+        <div
+            className='flex items-center justify-center w-full'
+        >
+            <div className={`mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10`}>
+                <div className="mb-2 flex justify-center">
                     <span className="inline-block w-full max-w-[100px]">
                         <Logo width="100%" />
                     </span>
-        </div>
-        <h2 className="text-center text-2xl font-bold leading-tight">Sign in to your account</h2>
-        <p className="mt-2 text-center text-base text-black/60">
+                </div>
+                <h2 className="text-center text-2xl font-bold leading-tight">Sign in to your account</h2>
+                <p className="mt-2 text-center text-base text-black/60">
                     Don&apos;t have any account?&nbsp;
                     <Link
                         to="/signup"
@@ -50,39 +64,39 @@ function Login() {
                     >
                         Sign Up
                     </Link>
-        </p>
-        {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
-        <form onSubmit={handleSubmit(login)} className='mt-8'>
-            <div className='space-y-5'>
-                <Input
-                label="Email: "
-                placeholder="Enter your email"
-                type="email"
-                {...register("email", {
-                    required: true,
-                    validate: {
-                        matchPatern: (value) => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
-                        "Email address must be a valid address",
-                    }
-                })}
-                />
-                <Input
-                label="Password: "
-                type="password"
-                placeholder="Enter your password"
-                {...register("password", {
-                    required: true,
-                })}
-                />
-                <Button
-                type="submit"
-                className="w-full"
-                >Sign in</Button>
+                </p>
+                {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
+                <form onSubmit={handleSubmit(login)} className='mt-8'>
+                    <div className='space-y-5'>
+                        <Input
+                            label="Email: "
+                            placeholder="Enter your email"
+                            type="email"
+                            {...register("email", {
+                                required: true,
+                                validate: {
+                                    matchPatern: (value) => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
+                                        "Email address must be a valid address",
+                                }
+                            })}
+                        />
+                        <Input
+                            label="Password: "
+                            type="password"
+                            placeholder="Enter your password"
+                            {...register("password", {
+                                required: true,
+                            })}
+                        />
+                        <Button
+                            type="submit"
+                            className="w-full"
+                        >Sign in</Button>
+                    </div>
+                </form>
             </div>
-        </form>
         </div>
-    </div>
-  )
+    )
 }
 
 export default Login

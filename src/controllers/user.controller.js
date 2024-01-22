@@ -40,7 +40,7 @@ const registerUser = asyncHandler(async (req, res) => {
     // if (!passwordRegex.test(password)){
     //     throw new ApiError(400, "Password must be at least 5 characters long and contain at least one number, one uppercase letter and one lowercase letter");
     // }
-    if (!email.includes('@')) {
+    if (!email?.includes('@')) {
         throw new ApiError(400, "@sign is missing in the email field");
     }
     const existedUser = await User.findOne({
@@ -49,25 +49,23 @@ const registerUser = asyncHandler(async (req, res) => {
     if (existedUser) {
         throw new ApiError(408, "Username or Email Already Exists");
     }
-    let avatarLocalPath;
-    if (req.files && Array.isArray(req.files.avatar) && req.files.avatar.length > 0) {
-        avatarLocalPath = req.files.avatar[0].path
-    }
-    else {
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
+    const coverImageLocalPath = req.files?.coverimage?.[0]?.path;
+
+    if (!avatarLocalPath) {
         throw new ApiError(408, "Avatar File Is Required");
     }
 
-    let coverImageLocalPath;
-    if (req.files && Array.isArray(req.files.coverimage) && req.files.coverimage.length > 0) {
-        coverImageLocalPath = req.files.coverimage[0].path
-    }
-    else {
+    if (!coverImageLocalPath) {
         throw new ApiError(408, "Cover Image File Is Required");
     }
     const avatarFolder = "avatar";
     const coverimageFolder = "coverimage";
-    const avatar = await uploadOnCloudinary(avatarLocalPath, avatarFolder);
-    const coverimage = await uploadOnCloudinary(coverImageLocalPath, coverimageFolder);
+    const [avatar, coverimage] = await Promise.all([
+        uploadOnCloudinary(avatarLocalPath, avatarFolder),
+        uploadOnCloudinary(coverImageLocalPath, coverimageFolder)
+    ]);
+
     const user = await User.create({
         fullname,
         avatar: avatar.url,
@@ -85,22 +83,20 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!createdUser) {
         throw new ApiError(500, "Something went wrong while registring the user");
     }
-    return res.status(201).json(
+    return res.status(200).json(
         new ApiResponse(200, createdUser, "User Registered Successfully")
     )
 })
 
 const loginUser = asyncHandler(async (req, res) => {
-    const { email, password, username } = req.body;
-    if ([username, email, password].some((field) => field?.trim() === "")) {
+    const { email, password} = req.body;
+    if ([email, password].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "All Fields Are Required");
     }
     if (!email) {
         throw new ApiError(400, "Email is required");
     }
-    const user = await User.findOne({
-        $or: [{ email }, { username }]
-    })
+    const user = await User.findOne({email})
     if (!user) {
         throw new ApiError(408, "User Does Not Exist");
     }
@@ -112,8 +108,10 @@ const loginUser = asyncHandler(async (req, res) => {
     const loggedinuser = await User.findById(user._id).select("-password");  //we made another call to database beacuse the user we got above did not had the refresh token because it was null.
     const options = {
         httpOnly: true,
-        secure: true
-    }
+        sameSite: 'None', // Allow cross-site requests
+        path: '/',
+    };
+    
     return res.status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
@@ -125,6 +123,7 @@ const loginUser = asyncHandler(async (req, res) => {
 })
 
 const logoutUser = asyncHandler(async (req, res) => {
+    console.log(req.cookies);
     await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -304,29 +303,29 @@ const getUserProfile = asyncHandler(async (req, res) => {
         },
         {
             $lookup: {
-              from: "posts",
-              localField: "_id",
-              foreignField: "author",
-              as: "userDetails"
+                from: "posts",
+                localField: "_id",
+                foreignField: "author",
+                as: "userDetails"
             }
-          },
-          {
+        },
+        {
             $addFields: {
-              TotalPosts: {
-                $size: "$userDetails"
-              }
+                TotalPosts: {
+                    $size: "$userDetails"
+                }
             }
-          },
-          {
+        },
+        {
             $project: {
-              TotalPosts:1,
-              fullname:1,
-              avatar:1,
-              coverimage:1,
-              username:1,
-              email:1,
+                TotalPosts: 1,
+                fullname: 1,
+                avatar: 1,
+                coverimage: 1,
+                username: 1,
+                email: 1,
             }
-          }
+        }
     ])
     if (!Profile?.length) {
         throw new ApiError(404, "Profile Not Found");
@@ -358,17 +357,17 @@ const deleteUserAccount = asyncHandler(async (req, res) => {
     )
 })
 
-const forgotPassword = asyncHandler(async (req, res)=>{
-    const {email} = req.body;
+const forgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body;
     if (!email) {
         throw new ApiError(410, "Email Is Missing");
     }
-    const user = await User.findOne({email});
+    const user = await User.findOne({ email });
     if (!user) {
         throw new ApiError(400, "User Does Not Exist");
     }
     const resetPassWordToken = user.generatePasswordRefreshToken();
-    await user.save({ValidateBeforeSave: false})
+    await user.save({ ValidateBeforeSave: false })
     // const resetPasswordUrl = `${req.protocol}://${req.get(
     //     'host'
     // )}/api/v1/users/reset-password/${resetPassWordToken}`;

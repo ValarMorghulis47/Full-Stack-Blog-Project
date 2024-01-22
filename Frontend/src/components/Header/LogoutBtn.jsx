@@ -7,12 +7,18 @@ import {dataclear} from "../../store/postSlice"
 function LogoutBtn() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const logoutHandler = () => {
-        authService.logout().then(() => {
-            dispatch(logout())
-            dispatch(dataclear())
-            navigate("/")
-        })
+    const logoutHandler = async() => {
+      console.log('Cookies:', document.cookie);
+      const respone = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/users/logout`, {
+        method: "GET",
+      })
+      if (!respone.ok) {
+        console.error("Server Error:", respone.status, await respone.text());
+        return;
+      }
+      console.log(respone);
+      dispatch(logout())
+      navigate('/')
     }
   return (
     <button

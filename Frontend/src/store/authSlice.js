@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    status : false,
+    IsLoggedIn : false,
     userData: null
 }
 
@@ -10,11 +10,12 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         login: (state, action) => {
-            state.status = true;
-            state.userData = action.payload.userData;
+            state.IsLoggedIn = true;
+            state.userData = action.payload;
+            console.log("The userData stored in the redux is: ", state.userData);
         },
         logout: (state) => {
-            state.status = false;
+            state.IsLoggedIn = false;
             state.userData = null;
         }
      }

@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
-import authService from '../appwrite/auth'
 import { Link, useNavigate } from 'react-router-dom'
-import { login } from '../store/authSlice'
 import { Button, Input, Logo } from './index.js'
 import { useDispatch } from 'react-redux'
 import { useForm } from 'react-hook-form'
@@ -13,19 +11,39 @@ function Signup() {
     const { register, handleSubmit } = useForm()
 
     const create = async (data) => {
-        setError("")
+        setError("");
         try {
-            const userData = await authService.createAccount({...data})
-            // if (userData) {
-            //     // const userData = await authService.getCurrentUser()
-            //     // if (userData) dispatch(login(userData));
-            //     navigate("/")
-            // }
-            navigate("/")
+            const formData = new FormData();
+        
+            // Append JSON data
+            formData.append('fullname', data.fullname);
+            formData.append('username', data.username);
+            formData.append('email', data.email);
+            formData.append('password', data.password);
+        
+            // Append file data
+            formData.append('avatar', data.avatar[0]);
+            formData.append('coverimage', data.coverimage[0]);
+            const userData = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/users/register`, {
+                method: "POST",
+                body: formData,
+            });
+        
+            if (!userData.ok) {
+                console.error("Server Error:", userData.status, await userData.text());
+                setError("An error occurred during registration. Please try again.");
+                return;
+            }
+        
+            console.log("Registration Successful:", await userData.json());
+            navigate("/");
         } catch (error) {
-            setError(error.message)
+            console.error("Error:", error.message);
+            setError("An unexpected error occurred. Please try again.");
         }
-    }
+        
+    };
+    
 
     return (
         <div className="flex items-center justify-center">
@@ -47,12 +65,12 @@ function Signup() {
                 </p>
                 {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
 
-                <form onSubmit={handleSubmit(create)}>
+                <form onSubmit={handleSubmit(create)} encType='multipart/form-data'>
                     <div className='space-y-5'>
                         <Input
                             label="Full Name: "
                             placeholder="Enter your full name"
-                            {...register("name", {
+                            {...register("fullname", {
                                 required: true,
                             })}
                         />
@@ -73,6 +91,27 @@ function Signup() {
                             type="password"
                             placeholder="Enter your password"
                             {...register("password", {
+                                required: true,
+                            })}
+                        />
+                        <Input
+                            label="Username: "
+                            placeholder="Enter your username"
+                            {...register("username", {
+                                required: true,
+                            })}
+                        />
+                        <Input
+                            label="Avatar Image: "
+                            type= "file"
+                            {...register("avatar", {
+                                required: true,
+                            })}
+                        />
+                        <Input
+                            label="Cover Image: "
+                            type= "file"
+                            {...register("coverimage", {
                                 required: true,
                             })}
                         />

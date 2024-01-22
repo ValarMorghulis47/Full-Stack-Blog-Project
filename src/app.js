@@ -13,7 +13,6 @@ app.use(express.json({limit: "20kb"}))      //For accepting data from the form
 app.use(express.urlencoded({extended: true, limit: "20kb"}))      //For accepting data from the url
 app.use(express.static("public"))   //For keeping static data on out server like: favicon,img
 app.use(cookieParser())
-
 //routes import
 import userRouter from './routes/user.routes.js';
 import postRouter from "./routes/post.routes.js"

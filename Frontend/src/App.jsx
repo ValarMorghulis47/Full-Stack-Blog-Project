@@ -3,45 +3,23 @@ import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { login, logout } from "./store/authSlice"
 import { Footer, Header } from './components'
-import authService from "./appwrite/auth"
 import { Outlet } from 'react-router-dom'
 import { useSelector } from 'react-redux';
-import databaseService from "./appwrite/databaseconfig"
 import { AllPost, dataclear } from "./store/postSlice"
 import { postdata } from "./store/postSlice"
+import axios from "axios"
 function App() {
   const [loading, setLoading] = useState(true)
   const dispatch = useDispatch()
-  const userStatus = useSelector((state) => state.auth.status)
-  useEffect(() => {
-    authService.getCurrentUser()
-      .then((userData) => {
-        if (userData) {
-          dispatch(login({ userData: userData}))
-          getpostspecific(userData)
-        } else {
-          dispatch(logout())
-        }
-      })
-    databaseService.getPosts().then((allposts) => {
-      if (allposts) {
-        dispatch(AllPost({ AllPost: allposts }))
-      }
-      else {
-        dispatch(dataclear())
-      }
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
+  useEffect(()=>{
+    const response = fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/users/currentuser`, {
+      method: 'GET'
     })
-    .finally(() => setLoading(false))
-  }, [userStatus,dispatch])
-  
-  const getpostspecific = (userData) => (databaseService.getPosts(userData.$id).then((post) => {
-    if (post) {
-      dispatch(postdata({ postData: post }))
+    if (response.status===200) {
+      dispatch(login(response));
     }
-    else {
-      dispatch(dataclear())
-    }
-  }))
+  }, [isLoggedIn])
   return (
     <div className='min-h-screen flex flex-wrap content-between bg-gray-400'>
       <div className='w-full block'>
