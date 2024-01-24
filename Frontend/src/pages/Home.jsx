@@ -1,12 +1,39 @@
 import React, { useEffect } from 'react'
 import { Container, PostCard } from '../components'
-import { useSelector } from 'react-redux';
+import { useSelector , useDispatch } from 'react-redux';
 import Loading from '../components/Loading';
 import { useState } from 'react';
+import { AllPost } from '../store/postSlice';
 function Home() {
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false);
     const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
+    const userData = useSelector((state)=> state.auth.userData)
+    const AllPosts = useSelector((state)=> state.post.AllPost)
+    const dispatch = useDispatch()
+    const [posts, setposts] = useState("");
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                setLoading(true);
+                const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.status === 200) {
+                    const postsData = await response.json();
+                    // console.log(postsData.data);
+                    dispatch(AllPost(postsData.data))
+                    setLoading(false);
+                }
+            } catch (error) {
+                // Handle errors here
+                setLoading(false);
+                console.error("Error fetching posts:", error);
+            }
+        };
+        fetchPosts();
+    }, [])
     if (IsLoggedIn === false) {
         return (
             <div className="w-full py-8 mt-4 text-center">
@@ -24,37 +51,38 @@ function Home() {
         )
     }
 
-    else(IsLoggedIn===true)
-        return (
-            <div className="w-full py-8 mt-4 text-center">
-                <Container>
-                {loading && <Loading />}
-                    <div className="flex flex-wrap">
-                        <div className="p-2 w-full">
-                            <h1 className="text-2xl font-bold hover:text-gray-500">
-                                Add a post to see one
-                            </h1>
-                        </div>
-                    </div>
-                </Container>
-            </div>
-        )
-    // else {
+    // else if(IsLoggedIn===true){
     //     return (
-    //         <div className='w-full py-8'>
+    //         <div className="w-full py-8 mt-4 text-center">
     //             <Container>
     //             {loading && <Loading />}
-    //                 <div className='flex flex-wrap'>
-    //                     {allpost?.map((post) => (
-    //                         <div key={post.$id} className='p-2 w-1/4'>
-    //                             <PostCard {...post} />
-    //                         </div>
-    //                     ))}
+    //                 <div className="flex flex-wrap">
+    //                     <div className="p-2 w-full">
+    //                         <h1 className="text-2xl font-bold hover:text-gray-500">
+    //                             Add a post to see one
+    //                         </h1>
+    //                     </div>
     //                 </div>
     //             </Container>
     //         </div>
     //     )
     // }
+    else {
+        return (
+            <div className='w-full py-8'>
+                <Container>
+                {loading && <Loading />}
+                    <div className='flex flex-wrap'>
+                        {AllPosts?.map((post) => (
+                            <div key={post._id} className='p-2 w-1/4'>
+                                <PostCard {...post} />
+                            </div>
+                        ))}
+                    </div>
+                </Container>
+            </div>
+        )
+    }
 
 }
 

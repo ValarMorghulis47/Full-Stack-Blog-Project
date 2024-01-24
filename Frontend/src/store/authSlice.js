@@ -10,17 +10,19 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         login: (state, action) => {
-            state.IsLoggedIn = true;
             state.userData = action.payload;
-            console.log("The userData stored in the redux is: ", state.userData);
+            console.log("The userData stored in the redux is: ", state.userData, " And the user is :", state.IsLoggedIn);
         },
         logout: (state) => {
-            state.IsLoggedIn = false;
             state.userData = null;
+        },
+        toggleloggedin: (state)=>{
+            console.log("The userData stored in the redux is: ", state.userData, " And the user is :", state.IsLoggedIn);
+            state.IsLoggedIn =!state.IsLoggedIn
         }
      }
 })
 
-export const {login, logout, IsLoggedIn} = authSlice.actions;
+export const {login, logout, toggleloggedin} = authSlice.actions;
 
 export default authSlice.reducer;

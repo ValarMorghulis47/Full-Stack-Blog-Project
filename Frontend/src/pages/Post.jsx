@@ -1,36 +1,50 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import appwriteService from "../appwrite/databaseconfig";
 import { Button, Container } from "../components";
 import parse from "html-react-parser";
 import { useDispatch, useSelector } from "react-redux";
-import { deletePost as deletePostAction} from "../store/postSlice";
+import { deletePost as deletePostAction } from "../store/postSlice";
 export default function Post() {
     const [post, setPost] = useState(null);
     const { slug } = useParams();
     const navigate = useNavigate();
-    const dispatch= useDispatch()
+    const dispatch = useDispatch()
+    console.log("Single Posts: ", post);
     const userData = useSelector((state) => state.auth.userData)
-    const isAuthor = post && userData ? post.userid === userData.$id : false;
+    const isAuthor = post && userData ? post.authorDetails._id === userData._id : false;
 
     useEffect(() => {
-        if (slug) {
-            appwriteService.getPost(slug).then((post) => {
-                if (post) {
-                    setPost(post);}
-                else navigate("/");
-            });
-        } else navigate("/");
+        const fetchPost = async () => {
+            if (slug) {
+                const post = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/${slug}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                })
+                if (post.status === 200) {
+                    const postData = await post.json();
+                    setPost(postData.data);
+                }
+                else{
+                    navigate('/')
+                }
+            }
+            else{
+                navigate('/')
+            }
+        }
+        fetchPost();
     }, [slug, navigate]);
 
-    const deletePost = () => {
-        appwriteService.deletePost(post.$id).then((status) => {
-            if (status) {
-                appwriteService.deleteFile(post.featuredImage);
-                dispatch(deletePostAction({ postId: post.$id }));
-                navigate("/");
-            }
-        });
+    const deletePost =  async() => {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/${slug}`,{
+        method: 'DELETE',
+        credentials: 'include'
+      })
+      if (response.status === 200) {
+        dispatch(deletePostAction(slug))
+        navigate('/')
+      }
+
     };
 
     return post ? (
@@ -38,14 +52,14 @@ export default function Post() {
             <Container>
                 <div className="w-full min-h-screen flex justify-center mb-4 relative border rounded-xl p-2">
                     <img
-                        src={appwriteService.getFilePreview(post.featuredImage)}
+                        src={post.image}
                         alt={post.title}
                         className="rounded-xl"
                     />
 
                     {isAuthor && (
                         <div className="absolute right-6 top-6">
-                            <Link to={`/edit-post/${post.$id}`}>
+                            <Link to={`/edit-post/${post._id}`}>
                                 <Button bgColor="bg-green-500" className="mr-3">
                                     Edit
                                 </Button>
@@ -62,7 +76,7 @@ export default function Post() {
                 </div>
                 <div className="browser-css">
                     {parse(post.content)}
-                    </div>
+                </div>
             </Container>
         </div>
     ) : null;

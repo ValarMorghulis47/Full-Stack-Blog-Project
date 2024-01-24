@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { login as authLogin } from '../store/authSlice'
-import { postdata } from '../store/postSlice'
+import { toggleloggedin } from '../store/authSlice'
 import { Button, Input, Logo } from "./index"
 import { useDispatch } from "react-redux"
 import { useForm } from "react-hook-form"
@@ -15,17 +14,13 @@ function Login() {
         setError("")
         try {
             console.log(data);
-            const formData = new FormData();
-
-            // Append JSON data
-            formData.append('email', data.email);
-            formData.append('password', data.password);
             const userData = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/users/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(data),
+                credentials: 'include'
             });
             
             if (!userData.ok) {
@@ -33,11 +28,7 @@ function Login() {
                 setError("An error occurred during login. Please try again.");
                 return;
             }
-            
-            const jsonData = await userData.json(); // Parse the response body as JSON
-            console.log("Loggi Succes", jsonData);
-            console.log("Cookies: ", document.cookie);
-            dispatch(authLogin(jsonData.data.user)); // Dispatch the action with the parsed JSON data
+            dispatch(toggleloggedin()); // Dispatch the action with the parsed JSON data
             navigate("/");
             
         } catch (error) {

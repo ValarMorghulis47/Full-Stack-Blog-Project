@@ -5,21 +5,32 @@ import { login, logout } from "./store/authSlice"
 import { Footer, Header } from './components'
 import { Outlet } from 'react-router-dom'
 import { useSelector } from 'react-redux';
-import { AllPost, dataclear } from "./store/postSlice"
-import { postdata } from "./store/postSlice"
-import axios from "axios"
 function App() {
   const [loading, setLoading] = useState(true)
   const dispatch = useDispatch()
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
-  useEffect(()=>{
-    const response = fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/users/currentuser`, {
-      method: 'GET'
-    })
-    if (response.status===200) {
-      dispatch(login(response));
-    }
-  }, [isLoggedIn])
+  const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/users/currentuser`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+  
+        if (response.status === 200) {
+          const userData = await response.json();
+          dispatch(login(userData.data));
+        }
+      } catch (error) {
+        // Handle errors here
+        console.error("Error fetching current user:", error);
+      }
+    };
+  
+    fetchCurrentUser();
+  }, [IsLoggedIn]);
+  
+  
   return (
     <div className='min-h-screen flex flex-wrap content-between bg-gray-400'>
       <div className='w-full block'>

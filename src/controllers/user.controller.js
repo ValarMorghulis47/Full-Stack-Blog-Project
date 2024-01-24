@@ -108,7 +108,6 @@ const loginUser = asyncHandler(async (req, res) => {
     const loggedinuser = await User.findById(user._id).select("-password");  //we made another call to database beacuse the user we got above did not had the refresh token because it was null.
     const options = {
         httpOnly: true,
-        sameSite: 'None', // Allow cross-site requests
         path: '/',
     };
     
@@ -123,7 +122,6 @@ const loginUser = asyncHandler(async (req, res) => {
 })
 
 const logoutUser = asyncHandler(async (req, res) => {
-    console.log(req.cookies);
     await User.findByIdAndUpdate(
         req.user._id,
         {

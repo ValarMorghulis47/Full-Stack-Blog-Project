@@ -1,23 +1,22 @@
 import React from 'react'
 import {useDispatch} from 'react-redux'
-import authService from '../../appwrite/auth'
 import {logout} from '../../store/authSlice'
 import { useNavigate } from 'react-router-dom'
-import {dataclear} from "../../store/postSlice"
+import { toggleloggedin } from '../../store/authSlice'
 function LogoutBtn() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const logoutHandler = async() => {
-      console.log('Cookies:', document.cookie);
       const respone = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/users/logout`, {
         method: "GET",
+        credentials: 'include'
       })
       if (!respone.ok) {
         console.error("Server Error:", respone.status, await respone.text());
         return;
       }
-      console.log(respone);
       dispatch(logout())
+      dispatch(toggleloggedin())
       navigate('/')
     }
   return (
