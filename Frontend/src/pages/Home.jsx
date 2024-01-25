@@ -9,10 +9,8 @@ function Home() {
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false);
     const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
-    const userData = useSelector((state)=> state.auth.userData)
     const AllPosts = useSelector((state)=> state.post.AllPost)
     const dispatch = useDispatch()
-    const [posts, setposts] = useState("");
     useEffect(() => {
         const fetchPosts = async () => {
             try {
@@ -21,10 +19,14 @@ function Home() {
                     method: 'GET',
                     credentials: 'include'
                 });
-                if (response.status === 200) {
+                if (response.ok) {
                     const postsData = await response.json();
                     // console.log(postsData.data);
                     dispatch(AllPost(postsData.data))
+                    setLoading(false);
+                }
+                else {
+                    console.error("Error fetching posts:", response.status);
                     setLoading(false);
                 }
             } catch (error) {
@@ -41,7 +43,7 @@ function Home() {
                 <Container>
                 {loading && <Loading />}
                     <div className="flex flex-wrap main-container">
-                        <div className="p-2 w-full">
+                        <div className="p-7 w-full">
                             <h1 className="text-2xl font-bold hover:text-gray-500">
                                 Login To Read Posts
                             </h1>

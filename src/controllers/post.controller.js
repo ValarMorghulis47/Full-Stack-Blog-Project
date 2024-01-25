@@ -78,7 +78,6 @@ const updatePost = asyncHandler(async (req, res) => {
 
 const getSinglePost = asyncHandler(async (req, res) => {
     const { postId } = req.params;
-    console.log(postId);
     if (!postId) {
         throw new ApiError(410, "Post Id Is Missing");
     }

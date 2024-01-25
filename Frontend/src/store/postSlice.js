@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     AllPost: null,
+    UserPost: null,
 };
 
 const postSlice = createSlice({
@@ -11,6 +12,10 @@ const postSlice = createSlice({
         AllPost: (state, action) => {
             state.AllPost = action.payload;
             console.log("All Posts Are: ", state.AllPost);
+        },
+        UserPost: (state, action) => {
+            state.UserPost = action.payload;
+            console.log("Users Posts Are: ", state.UserPost);
         },
         deletePost: (state, action) => {
             // Remove the deleted post from the state
@@ -31,6 +36,6 @@ const postSlice = createSlice({
     },
 });
 
-export const { dataclear, AllPost, deletePost, updatePost } = postSlice.actions;
+export const { dataclear, AllPost, deletePost, updatePost, UserPost } = postSlice.actions;
 
 export default postSlice.reducer;

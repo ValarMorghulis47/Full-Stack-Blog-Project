@@ -153,11 +153,8 @@ function Footer() {
                 <div className="container px-5 py-6 mx-auto flex items-center sm:flex-row flex-col">
                     <Link className="flex title-font font-medium items-center md:justify-start justify-center text-white" to="/">
                         <Logo />
-                        <span className="ml-3 text-xl">Tailblocks</span>
+                        <span className="ml-3 text-xl text-black">ValarMorghulis</span>
                     </Link>
-                    <p className="text-sm text-gray-400 sm:ml-6 sm:mt-0 mt-4">© 2020 Tailblocks —
-                        <Link href="https://twitter.com/knyttneve" className="text-gray-500 ml-1" target="_blank" rel="noopener noreferrer" to="/">@knyttneve</Link>
-                    </p>
                     <span className="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
                         <Link className="text-gray-400" to="/">
                             <svg fill="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">

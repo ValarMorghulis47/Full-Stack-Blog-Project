@@ -24,12 +24,15 @@
 }
 
 .main-container{
-    display: flex;
     align-items: center;
 }
 
 .height{
     height: 74vh;
+}
+
+.container-height{
+    height: 100%;
 }
 
 .header-height{

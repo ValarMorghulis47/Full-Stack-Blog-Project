@@ -96,6 +96,7 @@ export default function Post() {
     const dispatch = useDispatch()
     console.log("Single Posts: ", post);
     const userData = useSelector((state) => state.auth.userData)
+    const IsLoggedIn = useSelector((state)=> state.auth.IsLoggedIn)
     const isAuthor = post && userData ? post.authorDetails._id === userData._id : false;
 
     useEffect(() => {
@@ -118,7 +119,7 @@ export default function Post() {
             }
         }
         fetchPost();
-    }, [slug, navigate]);
+    }, [slug, navigate, IsLoggedIn]);
 
     const deletePost = async () => {
         const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/${slug}`, {
@@ -137,23 +138,19 @@ export default function Post() {
             <div className="flex flex-col justify-center">
                 <div className="flex flex-col md:flex-row max-w-7xl justify-center items-center ">
                     <div className="overflow-hidden w-full m-4 shadow-sm flex flex-col md:flex-row justify-center">
-                        <div className="flex flex-col md:flex-row items-center">
+                        <div className="flex flex-col md:flex-row">
                             <div className=" w-full overflow-hidden rounded-2xl"> <img src={post.image}/> </div>
                             <div className="md:w-2/3 m-4 ">
-                                <div className="flex text-gray-500 text-sm m-2">
-                                    <div className="m-1 font-bold">Vlog,</div>
-                                    <div className="m-1">31 March, 2023</div>
-                                </div>
-                                <div className="font-bold text-black text-xl m-2">{post.title}</div>
-                                <div className="text-sm text-gray-500 mt-4 m-2">{parse(post.content)}</div>
                                 <div className="flex cursor-pointer">
-                                    <div className="m-2"> <img src={post.authorDetails.avatar} alt=""
+                                    <div className="m-2 w-20"> <img src={post.authorDetails.avatar} alt=""
                                         className=" rounded-full" /> </div>
-                                    <div className="grid m-1">
+                                    <div className="grid m-3">
                                         <div className="font-bold text-sm hover:text-gray-600 mt-2">{post.authorDetails.username}</div>
                                         {/* <div className=" text-sm hover:text-gray-600">Student, Los Angeles</div> */}
                                     </div>
                                 </div>
+                                <div className="font-bold text-black text-xl m-2">{post.title}</div>
+                                <div className="text-sm text-gray-500 mt-4 m-2">{parse(post.content)}</div>
                             </div>
                         </div>
                     </div>
