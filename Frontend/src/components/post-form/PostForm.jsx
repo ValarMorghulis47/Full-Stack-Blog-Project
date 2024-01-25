@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Input, RTE, Select } from "../index";
-import appwriteService from "../../appwrite/databaseconfig";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { updatePost as update } from "../../store/postSlice";
