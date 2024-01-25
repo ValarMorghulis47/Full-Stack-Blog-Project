@@ -18,3 +18,17 @@
  .spinner{
     z-index: 60;
  } 
+
+.main{
+    height: 50vh;
+}
+
+.main-container{
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.height{
+    height: 30vh;
+}

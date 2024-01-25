@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import '../App.css'
 import { Container, PostCard } from '../components'
 import { useSelector , useDispatch } from 'react-redux';
 import Loading from '../components/Loading';
@@ -36,10 +37,10 @@ function Home() {
     }, [])
     if (IsLoggedIn === false) {
         return (
-            <div className="w-full py-8 mt-4 text-center">
+            <div className="w-full py-8 mt-4 text-center" >
                 <Container>
                 {loading && <Loading />}
-                    <div className="flex flex-wrap">
+                    <div className="flex flex-wrap height main-container">
                         <div className="p-2 w-full">
                             <h1 className="text-2xl font-bold hover:text-gray-500">
                                 Login To Read Posts
@@ -53,7 +54,9 @@ function Home() {
 
     // else if(IsLoggedIn===true){
     //     return (
-    //         <div className="w-full py-8 mt-4 text-center">
+    //         <div className="w-full py-8 mt-4 text-center" style='height: 100%;
+            // display: flex;
+            // align-items: center;'>
     //             <Container>
     //             {loading && <Loading />}
     //                 <div className="flex flex-wrap">
