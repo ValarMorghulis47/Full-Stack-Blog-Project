@@ -145,71 +145,11 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import Logo from '../Logo'
-
+import "../../App.css"
 function Footer() {
     return (
-        <footer className="text-gray-400 bg-gray-900 body-font">
-            <div className="container px-5 py-24 mx-auto">
-                <div className="flex flex-wrap md:text-left text-center order-first">
-                    <div className="lg:w-1/4 md:w-1/2 w-full px-4">
-                        <h2 className="title-font font-medium text-white tracking-widest text-sm mb-3">CATEGORIES</h2>
-                        <nav className="list-none mb-10">
-                            <li>
-                                <Link className="text-gray-400 hover:text-white" to="/">First Link</Link>
-                            </li>
-                            <li>
-                                <Link className="text-gray-400 hover:text-white" to="/">Second Link</Link>
-                            </li>
-                            <li>
-                                <Link className="text-gray-400 hover:text-white" to="/">Third Link</Link>
-                            </li>
-                            <li>
-                                <Link className="text-gray-400 hover:text-white" to="/">Fourth Link</Link>
-                            </li>
-                        </nav>
-                    </div>
-                    <div className="lg:w-1/4 md:w-1/2 w-full px-4">
-                        <h2 className="title-font font-medium text-white tracking-widest text-sm mb-3">CATEGORIES</h2>
-                        <nav className="list-none mb-10">
-                            <li>
-                                <Link className="text-gray-400 hover:text-white" to="/">First Link</Link>
-                            </li>
-                            <li>
-                                <Link className="text-gray-400 hover:text-white" to="/">Second Link</Link>
-                            </li>
-                            <li>
-                                <Link className="text-gray-400 hover:text-white" to="/">Third Link</Link>
-                            </li>
-                            <li>
-                                <Link className="text-gray-400 hover:text-white" to="/">Fourth Link</Link>
-                            </li>
-                        </nav>
-                    </div>
-                    <div className="lg:w-1/4 md:w-1/2 w-full px-4">
-                        <h2 className="title-font font-medium text-white tracking-widest text-sm mb-3">CATEGORIES</h2>
-                        <nav className="list-none mb-10">
-                            <li>
-                                <Link className="text-gray-400 hover:text-white" to="/">First Link</Link>
-                            </li>
-                            <li>
-                                <Link className="text-gray-400 hover:text-white" to="/">Second Link</Link>
-                            </li>
-                            <li>
-                                <Link className="text-gray-400 hover:text-white" to="/">Third Link</Link>
-                            </li>
-                            <li>
-                                <Link className="text-gray-400 hover:text-white" to="/">Fourth Link</Link>
-                            </li>
-                        </nav>
-                    </div>
-                    <div className="lg:w-1/4 md:w-1/2 w-full px-4">
-                        <h2 className="title-font font-medium text-white tracking-widest text-sm mb-3">SUBSCRIBE</h2>
-                        <p className="text-gray-500 text-sm mt-2 md:text-left text-center">Bitters chicharrones fanny pac
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div className="bg-gray-800 bg-opacity-75">
+        <footer className="bg-gray-100 text-gray-400 body-font">
+            <div className="bg-opacity-75">
                 <div className="container px-5 py-6 mx-auto flex items-center sm:flex-row flex-col">
                     <Link className="flex title-font font-medium items-center md:justify-start justify-center text-white" to="/">
                         <Logo />

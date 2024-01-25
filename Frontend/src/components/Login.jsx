@@ -4,6 +4,7 @@ import { toggleloggedin } from '../store/authSlice'
 import { Button, Input, Logo } from "./index"
 import { useDispatch } from "react-redux"
 import { useForm } from "react-hook-form"
+import "../App.css"
 function Login() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -38,7 +39,7 @@ function Login() {
 
     return (
         <div
-            className='flex items-center justify-center w-full'
+            className='flex items-center justify-center w-full height'
         >
             <div className={`mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10`}>
                 <div className="mb-2 flex justify-center">

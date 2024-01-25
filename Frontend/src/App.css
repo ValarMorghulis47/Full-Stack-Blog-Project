@@ -24,11 +24,23 @@
 }
 
 .main-container{
-    height: 100%;
     display: flex;
     align-items: center;
 }
 
 .height{
-    height: 30vh;
+    height: 74vh;
 }
+
+.header-height{
+    height: 15vh;
+}
+
+.footer-height{
+    position: relative;
+    bottom: -50vh;
+}
+
+/* .main-content{
+    height: calc(100vh-15vh-15vh);
+} */

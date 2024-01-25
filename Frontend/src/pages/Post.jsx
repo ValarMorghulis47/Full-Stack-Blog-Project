@@ -88,6 +88,7 @@ import { Button, Container } from "../components";
 import parse from "html-react-parser";
 import { useDispatch, useSelector } from "react-redux";
 import { deletePost as deletePostAction } from "../store/postSlice";
+import "../App.css"
 export default function Post() {
     const [post, setPost] = useState(null);
     const { slug } = useParams();
@@ -132,13 +133,12 @@ export default function Post() {
     };
 
     return post ? (
-        <div className="flex justify-center">
+        <div className="flex justify-center height">
             <div className="flex flex-col justify-center">
                 <div className="flex flex-col md:flex-row max-w-7xl justify-center items-center ">
                     <div className="overflow-hidden w-full m-4 shadow-sm flex flex-col md:flex-row justify-center">
                         <div className="flex flex-col md:flex-row items-center">
-                            <div className=" w-full overflow-hidden"> <img src={post.image} alt=""
-                                className="" /> </div>
+                            <div className=" w-full overflow-hidden rounded-2xl"> <img src={post.image}/> </div>
                             <div className="md:w-2/3 m-4 ">
                                 <div className="flex text-gray-500 text-sm m-2">
                                     <div className="m-1 font-bold">Vlog,</div>

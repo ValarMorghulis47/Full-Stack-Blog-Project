@@ -37,10 +37,10 @@ function Home() {
     }, [])
     if (IsLoggedIn === false) {
         return (
-            <div className="w-full py-8 mt-4 text-center" >
+            <div className="w-full py-8 text-center height" >
                 <Container>
                 {loading && <Loading />}
-                    <div className="flex flex-wrap height main-container">
+                    <div className="flex flex-wrap main-container">
                         <div className="p-2 w-full">
                             <h1 className="text-2xl font-bold hover:text-gray-500">
                                 Login To Read Posts
@@ -72,7 +72,7 @@ function Home() {
     // }
     else {
         return (
-            <div className='w-full py-8'>
+            <div className='w-full py-8 height'>
                 <Container>
                 {loading && <Loading />}
                     <div className='flex flex-wrap'>
