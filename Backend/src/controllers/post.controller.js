@@ -123,7 +123,9 @@ const getSinglePost = asyncHandler(async (req, res) => {
         ]
     )
     if (!post?.length) {
-        throw new ApiError(404, "Post Not Found");
+        return res.status(200).json(
+            new ApiResponse(200, post[0], "Post Found Successfully")
+        )
     }
     return res.status(200).json(
         new ApiResponse(200, post[0], "Post Found Successfully")
@@ -152,7 +154,9 @@ const getAllPosts = asyncHandler(async (req, res) => {
         .limit(limit);
 
     if (!Posts.length) {
-        throw new ApiError(430, "No Posts Found");
+        return res.status(200).json(
+            new ApiResponse(200, Posts, "Posts Fetched Successfully")
+        );
     }
 
     // Return the result to the client
@@ -179,7 +183,9 @@ const getUserPosts = asyncHandler(async (req, res) => {
         ]
         )
     if (!userPosts?.length) {
-        throw new ApiError(404, "No Posts Found");
+        return res.status(200).json(
+            new ApiResponse(200, userPosts, "Posts Fetched Successfully")
+        );
     }
     return res.status(200).json(
         new ApiResponse(200, userPosts, "Posts Fetched Successfully")

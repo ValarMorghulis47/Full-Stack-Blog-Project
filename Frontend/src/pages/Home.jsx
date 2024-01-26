@@ -54,24 +54,22 @@ function Home() {
         )
     }
 
-    // else if(IsLoggedIn===true){
-    //     return (
-    //         <div className="w-full py-8 mt-4 text-center" style='height: 100%;
-            // display: flex;
-            // align-items: center;'>
-    //             <Container>
-    //             {loading && <Loading />}
-    //                 <div className="flex flex-wrap">
-    //                     <div className="p-2 w-full">
-    //                         <h1 className="text-2xl font-bold hover:text-gray-500">
-    //                             Add a post to see one
-    //                         </h1>
-    //                     </div>
-    //                 </div>
-    //             </Container>
-    //         </div>
-    //     )
-    // }
+    else if(AllPosts?.length===0){
+        return (
+            <div className="w-full py-8 mt-4 text-center height">
+                <Container>
+                {loading && <Loading />}
+                    <div className="flex flex-wrap">
+                        <div className="p-2 w-full">
+                            <h1 className="text-2xl font-bold hover:text-gray-500">
+                                Add a post to see one
+                            </h1>
+                        </div>
+                    </div>
+                </Container>
+            </div>
+        )
+    }
     else {
         return (
             <div className='w-full py-8 height'>
