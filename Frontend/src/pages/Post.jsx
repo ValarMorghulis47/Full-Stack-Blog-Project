@@ -83,7 +83,7 @@
 // }
 
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {useNavigate, useParams } from "react-router-dom";
 import { Button, Container } from "../components";
 import parse from "html-react-parser";
 import { useDispatch, useSelector } from "react-redux";
@@ -94,7 +94,6 @@ export default function Post() {
     const { slug } = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch()
-    console.log("Single Posts: ", post);
     const userData = useSelector((state) => state.auth.userData)
     const IsLoggedIn = useSelector((state)=> state.auth.IsLoggedIn)
     const isAuthor = post && userData ? post.authorDetails._id === userData._id : false;
@@ -146,7 +145,6 @@ export default function Post() {
                                         className=" rounded-full" /> </div>
                                     <div className="grid m-3">
                                         <div className="font-bold text-sm hover:text-gray-600 mt-2">{post.authorDetails.username}</div>
-                                        {/* <div className=" text-sm hover:text-gray-600">Student, Los Angeles</div> */}
                                     </div>
                                 </div>
                                 <div className="font-bold text-black text-xl m-2">{post.title}</div>
