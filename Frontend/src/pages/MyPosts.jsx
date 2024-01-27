@@ -10,15 +10,18 @@ function AllPosts() {
     const userData = useSelector((state)=> state.auth.userData)
     const dispatch = useDispatch()
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    // console.log(userData._id);
     useEffect(() => {
         const fetchPosts = async () => {
             try {
+                console.log("use effect of my post triggered");
                 setLoading(true);
-                const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/user/${userData._id}`, {
+                const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/user/${userData._id}`,{
                     method: 'GET',
-                    credentials: 'include'
-                });
+                    credentials: 'include',
+                    cache: 'no-cache'
+                })
+                // console.log(await response.json());
                 if (response.ok) {
                     const postsData = await response.json();
                     // console.log(postsData.data);
@@ -26,7 +29,9 @@ function AllPosts() {
                     setLoading(false);
                 }
                 else {
-                    console.error("Error fetching posts:", response.status);
+                    const error = await response.json();
+                    console.log(error);
+                    dispatch(UserPost())
                     setLoading(false);
                 }
             } catch (error) {
@@ -37,7 +42,7 @@ function AllPosts() {
         };
         fetchPosts();
     }, [])
-        if (UserPosts?.length === 0) {
+        if (UserPosts?.length==0) {
             return (
                 <div className="w-full py-8 mt-4 text-center height">
                     <Container>

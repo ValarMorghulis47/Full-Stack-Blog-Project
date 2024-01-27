@@ -1,7 +1,7 @@
 import './App.css'
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { login, logout } from "./store/authSlice"
+import { login} from "./store/authSlice"
 import { Footer, Header } from './components'
 import { Outlet } from 'react-router-dom'
 import { useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ function App() {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
+        console.log("Use Effect of app triggered");
         setLoading(true);
         const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/users/currentuser`, {
           method: 'GET',

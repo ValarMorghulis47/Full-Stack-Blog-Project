@@ -16,8 +16,9 @@ const generateTokens = async (userId) => {
         // user.refreshToken = refreshToken; // adding refresh token in the user database
         // await user.save({ ValidateBeforeSave: false }) //dont validate. we just want save the referesh token in the database
         return { accessToken, refreshToken };
-    } catch (error) {
-        throw new ApiError(500, "Something went wrong while making the tokens")
+    } catch (err) {
+        const error = new ApiError(500, "Something went wrong while making the tokens")
+        return res.status(error.statusCode).json(error.toResponse());
     }
 
 }
@@ -35,29 +36,34 @@ const registerUser = asyncHandler(async (req, res) => {
     const { fullname, username, email, password } = req.body;
     // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{5,}$/;
     if ([fullname, username, email, password].some((field) => field?.trim() === "")) {
-        throw new ApiError(400, "All Fields Are Required");
+        const error = new ApiError(400, "All Fields Are Required");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     // if (!passwordRegex.test(password)){
-    //     throw new ApiError(400, "Password must be at least 5 characters long and contain at least one number, one uppercase letter and one lowercase letter");
+    //     const error = new ApiError(400, "Password must be at least 5 characters long and contain at least one number, one uppercase letter and one lowercase letter");
     // }
     if (!email?.includes('@')) {
-        throw new ApiError(400, "@sign is missing in the email field");
+        const error = new ApiError(400, "@sign is missing in the email field");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const existedUser = await User.findOne({
         $or: [{ email }, { username }]
     })
     if (existedUser) {
-        throw new ApiError(408, "Username or Email Already Exists");
+        const error = new ApiError(408, "Username or Email Already Exists");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const avatarLocalPath = req.files?.avatar?.[0]?.path;
     const coverImageLocalPath = req.files?.coverimage?.[0]?.path;
 
     if (!avatarLocalPath) {
-        throw new ApiError(408, "Avatar File Is Required");
+        const error = new ApiError(408, "Avatar File Is Required");
+        return res.status(error.statusCode).json(error.toResponse());
     }
 
     if (!coverImageLocalPath) {
-        throw new ApiError(408, "Cover Image File Is Required");
+        const error = new ApiError(408, "Cover Image File Is Required");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const avatarFolder = "avatar";
     const coverimageFolder = "coverimage";
@@ -81,7 +87,8 @@ const registerUser = asyncHandler(async (req, res) => {
         "-password"
     )
     if (!createdUser) {
-        throw new ApiError(500, "Something went wrong while registring the user");
+        const error = new ApiError(500, "Something went wrong while registring the user");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     return res.status(200).json(
         new ApiResponse(200, createdUser, "User Registered Successfully")
@@ -91,18 +98,22 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password} = req.body;
     if ([email, password].some((field) => field?.trim() === "")) {
-        throw new ApiError(400, "All Fields Are Required");
+        const error = new ApiError(400, "All Fields Are Required");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     if (!email) {
-        throw new ApiError(400, "Email is required");
+        const error = new ApiError(400, "Email is required");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const user = await User.findOne({email})
     if (!user) {
-        throw new ApiError(408, "User Does Not Exist");
+       const error = new ApiError(408, "Invalid Email Or Password");
+       return res.status(error.statusCode).json(error.toResponse());
     }
     const isPasswordValid = await user.isPasswordCorrect(password);
     if (!isPasswordValid) {
-        throw new ApiError(404, "Invalid Password")
+        const error = new ApiError(404, "Invalid Password")
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const { accessToken, refreshToken } = await generateTokens(user._id);
     const loggedinuser = await User.findById(user._id).select("-password");  //we made another call to database beacuse the user we got above did not had the refresh token because it was null.
@@ -148,7 +159,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 const refereshAccessToken = asyncHandler(async (req, res) => {
     const incomingrefreshtoken = req.cookies.refreshToken || req.body.refreshToken;
     if (!incomingrefreshtoken) {
-        throw new ApiError(400, "Refresh Token is required");
+        const error = new ApiError(400, "Refresh Token is required");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     try {
         const decodedToken = jwt.verify(
@@ -157,10 +169,12 @@ const refereshAccessToken = asyncHandler(async (req, res) => {
         )
         const user = await User.findById(decodedToken?._id);
         if (!user) {
-            throw new ApiError(400, "Invalid Refresh Token");
+            const error = new ApiError(400, "Invalid Refresh Token");
+            return res.status(error.statusCode).json(error.toResponse());
         }
         if (incomingrefreshtoken !== user?.refreshToken) {
-            throw new ApiError(404, "Refresh Token Is Expired");
+            const error = new ApiError(404, "Refresh Token Is Expired");
+            return res.status(error.statusCode).json(error.toResponse());
         }
         const options = {
             httpOnly: true,
@@ -175,23 +189,27 @@ const refereshAccessToken = asyncHandler(async (req, res) => {
                     accessToken, refreshToken: newrefreshToken
                 }, "Refresh Token Refreshed")
             )
-    } catch (error) {
-        throw new ApiError(405, error?.message || "Invalid Refresh Token");
+    } catch (er) {
+        const error = new ApiError(405, er?.message || "Invalid Refresh Token");
+        return res.status(error.statusCode).json(error.toResponse());
     }
 })
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword, confirmpassword } = req.body;
     if (newPassword !== confirmpassword) {
-        throw new ApiError(406, "Passwords Do Not Match");
+        const error = new ApiError(406, "Passwords Do Not Match");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const user = await User.findById(req.user?._id);
     if (!user) {
-        throw new ApiError(400, "User Does Not Exist");
+        const error = new ApiError(400, "User Does Not Exist");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const isPasswordValid = await user.isPasswordCorrect(oldPassword);
     if (!isPasswordValid) {
-        throw new ApiError(404, "Invalid Old Password")
+        const error = new ApiError(404, "Invalid Old Password")
+        return res.status(error.statusCode).json(error.toResponse());
     }
     user.password = newPassword;
     await user.save({ ValidateBeforeSave: false });
@@ -203,7 +221,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
     // const user = await User.findById(req.user?._id);
     // if (!user) {
-    //     throw new ApiError(400, "User Does Not Exist");
+    //     const error = new ApiError(400, "User Does Not Exist");
     // }
     return res.status(200).json(
         new ApiResponse(200, req.user, "Current User Retrieved Successfully")
@@ -213,11 +231,13 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 const upDateUserDetails = asyncHandler(async (req, res) => {
     const { fullname, email, username } = req.body;
     if (!(fullname && email && username)) {
-        throw new ApiError(410, "All Fields Are Required");
+        const error = new ApiError(410, "All Fields Are Required");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const existedUser = await User.findOne({ username })
     if (existedUser?.username === username) {
-        throw new ApiError(408, "Username Already Exists");
+        const error = new ApiError(408, "Username Already Exists");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const user = await User.findByIdAndUpdate(req.user?._id, {
         $set: {
@@ -236,12 +256,14 @@ const upDateUserDetails = asyncHandler(async (req, res) => {
 const updateUserAvatar = asyncHandler(async (req, res) => {
     const avatarLocalPath = req.file?.path;
     if (!avatarLocalPath) {
-        throw new ApiError(408, "Avatar File Is Required");
+        const error = new ApiError(408, "Avatar File Is Required");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const avatarFolder = "avatar";
     const avatar = await uploadOnCloudinary(avatarLocalPath, avatarFolder);
     if (!avatar) {
-        throw new ApiError(408, "Error while uploading avatar file on cloudinary");
+        const error = new ApiError(408, "Error while uploading avatar file on cloudinary");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const user = await User.findById(req.user?._id).select("avatar");
     const previousPublicId = user.avatarPublicId;
@@ -263,12 +285,14 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 const updateUserCoverImage = asyncHandler(async (req, res) => {
     const coverImageLocalPath = req.file?.path;
     if (!coverImageLocalPath) {
-        throw new ApiError(408, "Cover Image File Is Required");
+        const error = new ApiError(408, "Cover Image File Is Required");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const coverimageFolder = "coverimage";
     const coverimage = await uploadOnCloudinary(coverImageLocalPath, coverimageFolder);
     if (!coverimage) {
-        throw new ApiError(408, "Error while uploading cover image file on cloudinary");
+        const error = new ApiError(408, "Error while uploading cover image file on cloudinary");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const user = await User.findById(req.user?._id).select("coverimage");
     const previousPublicId = user.coverimagePublicId;
@@ -291,7 +315,8 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 const getUserProfile = asyncHandler(async (req, res) => {
     const { userId } = req.params;
     if (!userId) {
-        throw new ApiError(410, "UserId Is Missing");
+        const error = new ApiError(410, "UserId Is Missing");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const Profile = await User.aggregate([
         {
@@ -326,7 +351,8 @@ const getUserProfile = asyncHandler(async (req, res) => {
         }
     ])
     if (!Profile?.length) {
-        throw new ApiError(404, "Profile Not Found");
+        const error = new ApiError(404, "Profile Not Found");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     return res.status(200).json(
         new ApiResponse(200, Profile[0], "Profile Retrieved Successfully")
@@ -336,7 +362,8 @@ const getUserProfile = asyncHandler(async (req, res) => {
 const deleteUserAccount = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user?._id);
     if (!user) {
-        throw new ApiError(400, "User Does Not Exist");
+        const error = new ApiError(400, "User Does Not Exist");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     // const previousAvatarPublicId = user.avatar ? user.avatar.split("/").pop().split(".")[0] : null;
     const previousAvatarPublicId = user.avatarPublicId;
@@ -358,11 +385,13 @@ const deleteUserAccount = asyncHandler(async (req, res) => {
 const forgotPassword = asyncHandler(async (req, res) => {
     const { email } = req.body;
     if (!email) {
-        throw new ApiError(410, "Email Is Missing");
+        const error = new ApiError(410, "Email Is Missing");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const user = await User.findOne({ email });
     if (!user) {
-        throw new ApiError(400, "User Does Not Exist");
+        const error = new ApiError(400, "User Does Not Exist");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const resetPassWordToken = user.generatePasswordRefreshToken();
     await user.save({ ValidateBeforeSave: false })
@@ -380,11 +409,12 @@ const forgotPassword = asyncHandler(async (req, res) => {
         return res.status(200).json(
             new ApiResponse(200, {}, "Email Sent Successfully")
         );
-    } catch (error) {
+    } catch (err) {
         user.passwordRefreshToken = undefined;
         user.passwordResetTokenExpiry = undefined;
         await user.save({ validateBeforeSave: false });
-        throw new ApiError(500, "There was an error in sending the mail");
+        const error = new ApiError(500, "There was an error in sending the mail");
+        return res.status(error.statusCode).json(error.toResponse());
     }
 })
 
@@ -394,11 +424,13 @@ const resetPassword = asyncHandler(async (req, res) => {
         passwordResetTokenExpiry: { $gt: Date.now() },
     });
     if (!user) {
-        throw new ApiError(408, "User Does not exists or the token is expired")
+        const error = new ApiError(408, "User Does not exists or the token is expired")
+        return res.status(error.statusCode).json(error.toResponse());
     }
 
     if (req.body.password !== req.body.confirmpassword) {
-        throw new ApiError(408, "Passwords Do not match")
+        const error = new ApiError(408, "Passwords Do not match")
+        return res.status(error.statusCode).json(error.toResponse());
     }
 
     user.password = req.body.password;

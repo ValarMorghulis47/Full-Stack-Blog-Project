@@ -1,6 +1,7 @@
 import React from 'react'
 import {useDispatch} from 'react-redux'
 import {logout} from '../../store/authSlice'
+import { dataclear } from '../../store/postSlice'
 import { useNavigate } from 'react-router-dom'
 import { toggleloggedin } from '../../store/authSlice'
 function LogoutBtn() {
@@ -16,6 +17,7 @@ function LogoutBtn() {
         return;
       }
       dispatch(logout())
+      dispatch(dataclear())
       dispatch(toggleloggedin())
       navigate('/')
     }

@@ -10,16 +10,19 @@ import mongoose from "mongoose"
 const createPost = asyncHandler(async (req, res) => {
     const { title, content } = req.body;
     if (!title || !content) {
-        throw new ApiError(410, "Title or Content Is Missing");
+        const error = new ApiError(410, "Title or Content Is Missing");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const postimgLocalPath = req.file?.path;
     if (!postimgLocalPath) {
-        throw new ApiError(408, "Post Image Is Required");
+        const error = new ApiError(408, "Post Image Is Required");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const postimgFolder = "post";
     const postimg = await uploadOnCloudinary(postimgLocalPath, postimgFolder);
     if (!postimg) {
-        throw new ApiError(508, "Error while uploading post image file on cloudinary");
+        const error = new ApiError(508, "Error while uploading post image file on cloudinary");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const post = await Post.create({
         title,
@@ -29,7 +32,8 @@ const createPost = asyncHandler(async (req, res) => {
         imagePublicId: postimg.public_id
     })
     if (!post) {
-        throw new ApiError(503, "Error while creating post");
+        const error = new ApiError(503, "Error while creating post");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     return res.status(200).json(
         new ApiResponse(200, post, "Post Created Successfully")
@@ -39,26 +43,31 @@ const createPost = asyncHandler(async (req, res) => {
 const updatePost = asyncHandler(async (req, res) => {
     const { postId } = req.params;
     if (!postId) {
-        throw new ApiError(410, "Post Id Is Missing");
+        const error = new ApiError(410, "Post Id Is Missing");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const { title, content } = req.body;
     const existedpost = await Post.findById({ _id: postId });
     if (!existedpost) {
-        throw new ApiError(404, "Post Not Found");
+        const error = new ApiError(404, "Post Not Found");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     if (!title || !content) {
-        throw new ApiError(410, "Title or Content Is Missing");
+        const error = new ApiError(410, "Title or Content Is Missing");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const existedpostimg = existedpost.imagePublicId;
     const postimgFolder = "post";
     await DeleteFileCloudinary(existedpostimg, postimgFolder);
     const postimgLocalPath = req.file?.path;
     if (!postimgLocalPath) {
-        throw new ApiError(408, "Post Image Is Required");
+        const error = new ApiError(408, "Post Image Is Required");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const postimg = await uploadOnCloudinary(postimgLocalPath, postimgFolder);
     if (!postimg) {
-        throw new ApiError(508, "Error while uploading post image file on cloudinary");
+        const error = new ApiError(508, "Error while uploading post image file on cloudinary");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const updatedPost = await Post.findByIdAndUpdate(postId, {
         $set: {
@@ -69,7 +78,8 @@ const updatePost = asyncHandler(async (req, res) => {
         }
     })
     if (!updatedPost) {
-        throw new ApiError(503, "Error while updating post");
+        const error = new ApiError(503, "Error while updating post");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     return res.status(200).json(
         new ApiResponse(200, updatedPost, "Post Updated Successfully")
@@ -79,7 +89,8 @@ const updatePost = asyncHandler(async (req, res) => {
 const getSinglePost = asyncHandler(async (req, res) => {
     const { postId } = req.params;
     if (!postId) {
-        throw new ApiError(410, "Post Id Is Missing");
+        const error = new ApiError(410, "Post Id Is Missing");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const post = await Post.aggregate(
         [
@@ -123,9 +134,8 @@ const getSinglePost = asyncHandler(async (req, res) => {
         ]
     )
     if (!post?.length) {
-        return res.status(200).json(
-            new ApiResponse(200, post[0], "Post Found Successfully")
-        )
+        const error = new ApiError(410, "No Posts Found")
+        return res.status(error.statusCode).json(error.toResponse());
     }
     return res.status(200).json(
         new ApiResponse(200, post[0], "Post Found Successfully")
@@ -154,9 +164,8 @@ const getAllPosts = asyncHandler(async (req, res) => {
         .limit(limit);
 
     if (!Posts.length) {
-        return res.status(200).json(
-            new ApiResponse(200, Posts, "Posts Fetched Successfully")
-        );
+        const error = new ApiError(410, "No Posts Found")
+        return res.status(error.statusCode).json(error.toResponse());
     }
 
     // Return the result to the client
@@ -183,9 +192,8 @@ const getUserPosts = asyncHandler(async (req, res) => {
         ]
         )
     if (!userPosts?.length) {
-        return res.status(200).json(
-            new ApiResponse(200, userPosts, "Posts Fetched Successfully")
-        );
+        const error = new ApiError(410, "No Posts For This User")
+        return res.status(error.statusCode).json(error.toResponse());
     }
     return res.status(200).json(
         new ApiResponse(200, userPosts, "Posts Fetched Successfully")
@@ -195,14 +203,16 @@ const getUserPosts = asyncHandler(async (req, res) => {
 const deletePost = asyncHandler(async (req, res)=>{
     const { postId } = req.params;
     if (!postId) {
-        throw new ApiError(410, "Post Id Is Missing");
+        const error = new ApiError(410, "Post Id Is Missing");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const existedpost = await Post.findById({ _id: postId }).select("imagePublicId");
     const postimgFolder = "post";
     await DeleteFileCloudinary(existedpost.imagePublicId, postimgFolder)
     const deletedPost = await Post.findByIdAndDelete(postId);
     if (!deletedPost) {
-        throw new ApiError(404, "Post Not Found");
+        const error = new ApiError(404, "Post Not Found");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     return res.status(200).json(
         new ApiResponse(200, {}, "Post Deleted Successfully")

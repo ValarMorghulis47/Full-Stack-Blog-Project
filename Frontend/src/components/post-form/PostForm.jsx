@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { Button, Input, RTE, Select } from "../index";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { updatePost as update } from "../../store/postSlice";
+import { AllPost, updatePost as update, UserPost } from "../../store/postSlice";
 import { useDispatch } from 'react-redux';
 import Loading from '../Loading';
 
@@ -22,6 +22,7 @@ export default function PostForm({ post }) {
   const navigate = useNavigate();
   const userData = useSelector((state) => state.auth.userData);
   const allpost = useSelector((state) => state.post.AllPost)
+  const userpost = useSelector((state) => state.post.UserPost)
   const submit = async (data) => {
     if (post) {
       setLoading(true);
@@ -81,6 +82,8 @@ export default function PostForm({ post }) {
         }
         const postData = await userData.json();
         console.log("Registration Successful:", postData);
+        dispatch(AllPost([postData.data, ...allpost]));  // Update the state by adding the new post
+        dispatch(UserPost(userpost ? [postData.data, ...userpost] : [postData.data]));
         navigate(`/post/${postData.data._id}`);
       } catch (error) {
         console.error("Error:", error.message);

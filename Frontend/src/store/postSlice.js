@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    AllPost: null,
-    UserPost: null,
+    AllPost: [],
+    UserPost: [],
 };
 
 const postSlice = createSlice({
@@ -31,7 +31,8 @@ const postSlice = createSlice({
             state.AllPost = updatedPosts;
         },
         dataclear: (state) => {
-            state.AllPost = null;
+            state.AllPost = [];
+            state.UserPost = [];
         },
     },
 });

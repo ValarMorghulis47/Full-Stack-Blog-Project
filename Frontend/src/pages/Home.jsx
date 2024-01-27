@@ -6,14 +6,14 @@ import Loading from '../components/Loading';
 import { useState } from 'react';
 import { AllPost } from '../store/postSlice';
 function Home() {
-    const [error, setError] = useState("")
     const [loading, setLoading] = useState(false);
-    const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
     const AllPosts = useSelector((state)=> state.post.AllPost)
+    const IsLoggedIn = useSelector((state)=> state.auth.IsLoggedIn)
     const dispatch = useDispatch()
     useEffect(() => {
         const fetchPosts = async () => {
             try {
+                console.log("use effect of home triggered");
                 setLoading(true);
                 const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/`, {
                     method: 'GET',
@@ -21,12 +21,12 @@ function Home() {
                 });
                 if (response.ok) {
                     const postsData = await response.json();
-                    // console.log(postsData.data);
                     dispatch(AllPost(postsData.data))
                     setLoading(false);
                 }
                 else {
-                    console.error("Error fetching posts:", response.status);
+                    const error = await response.json();
+                    dispatch(AllPost())
                     setLoading(false);
                 }
             } catch (error) {
@@ -54,7 +54,7 @@ function Home() {
         )
     }
 
-    else if(AllPosts?.length===0){
+    else if(AllPosts?.length==0){
         return (
             <div className="w-full py-8 mt-4 text-center height">
                 <Container>
