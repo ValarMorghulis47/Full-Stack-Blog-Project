@@ -10,6 +10,7 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         login: (state, action) => {
+            state.IsLoggedIn = true;
             state.userData = action.payload;
             console.log("The userData stored in the redux is: ", state.userData, " And the user is :", state.IsLoggedIn);
         },

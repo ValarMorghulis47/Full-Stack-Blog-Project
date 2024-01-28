@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import Loading from '../components/Loading';
 import "../App.css"
 function AllPosts() {
+    console.log("my post page mounted");
     const UserPosts = useSelector((state) => state.post.UserPost)
     const userData = useSelector((state)=> state.auth.userData)
     const dispatch = useDispatch()
@@ -72,7 +73,6 @@ function AllPosts() {
                 </div>
             )
         }
-    
 }
 
 export default AllPosts

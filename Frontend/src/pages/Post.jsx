@@ -90,6 +90,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { deletePost as deletePostAction } from "../store/postSlice";
 import "../App.css"
 export default function Post() {
+    console.log("Post page mounted");
     const [post, setPost] = useState(null);
     const { slug } = useParams();
     const navigate = useNavigate();

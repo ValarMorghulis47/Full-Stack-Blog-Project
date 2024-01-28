@@ -15,12 +15,12 @@ function Home() {
         const fetchPosts = async () => {
             try {
                 console.log("use effect of home triggered");
-                setLoading(true);
                 const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/`, {
                     method: 'GET',
                     credentials: 'include'
                 });
                 if (response.ok) {
+                    console.log("i am in if");
                     const postsData = await response.json();
                     dispatch(AllPost(postsData.data))
                     setLoading(false);
@@ -34,8 +34,9 @@ function Home() {
                 // console.error("Error fetching posts:", error);
             }
         };
+        setLoading(true);
         fetchPosts();
-    }, [])
+    }, [IsLoggedIn])
     if (IsLoggedIn === false) {
         return (
             <div className="w-full py-8 text-center height" >
