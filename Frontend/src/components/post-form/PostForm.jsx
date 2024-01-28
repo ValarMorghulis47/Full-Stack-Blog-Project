@@ -43,7 +43,7 @@ export default function PostForm({ post }) {
         console.error("Failed to update post:", updatePost.status, await updatePost.text());
         setLoading(false);
 
-      } 
+      }
       const jsonPost = await updatePost.json();
       console.log("Updated Successful:", jsonPost);
       // Dispatch the updatePost action after successfully updating the post on the server
@@ -58,7 +58,6 @@ export default function PostForm({ post }) {
       navigate(`/post/${jsonPost.data._id}`)
       // Other actions if needed
     } else {
-      console.log("iam in else");
       setLoading(true);
       setError("");
       try {
@@ -134,10 +133,10 @@ export default function PostForm({ post }) {
         {loading && <Loading />}
       </div>
       <div className="w-2/3 px-2">
+      <label className="block text-gray-700 text-sm font-bold mb-4">Post Title :</label>
         <Input
-          label="Title :"
           placeholder="Title"
-          className="mb-4"
+          className="block text-gray-700 text-sm font-bold mb-4"
           {...register("title", { required: true })}
         />
         {/* <Input
@@ -152,13 +151,15 @@ export default function PostForm({ post }) {
         <RTE label="Content :" name="content" control={control} defaultValue={getValues("content")} />
       </div>
       <div className="w-1/3 px-2">
-        <Input
+        {/* <Input
           label="Featured Image :"
           type="file"
           className="mb-4"
           accept="image/png, image/jpg, image/jpeg, image/gif"
           {...register("image", { required: !post })}
-        />
+        /> */}
+        <label className="block text-gray-700 text-sm font-bold mb-4">Post Image</label>
+        <input id="example1" type="file" className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" {...register("image", { required: !post })} />
         {post && (
           <div className="w-full mb-4">
             <img
@@ -174,7 +175,7 @@ export default function PostForm({ post }) {
           className="mb-4"
           {...register("status", { required: true })}
         /> */}
-        <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full">
+        <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full mt-4">
           {post ? "Update" : "Submit"}
         </Button>
       </div>
