@@ -6,6 +6,7 @@ import Loading from '../components/Loading';
 import { useState } from 'react';
 import { AllPost } from '../store/postSlice';
 function Home() {
+    console.log("Home component rendering");
     const [loading, setLoading] = useState(false);
     const AllPosts = useSelector((state)=> state.post.AllPost)
     const IsLoggedIn = useSelector((state)=> state.auth.IsLoggedIn)
@@ -25,14 +26,12 @@ function Home() {
                     setLoading(false);
                 }
                 else {
-                    const error = await response.json();
-                    dispatch(AllPost())
                     setLoading(false);
                 }
             } catch (error) {
                 // Handle errors here
                 setLoading(false);
-                console.error("Error fetching posts:", error);
+                // console.error("Error fetching posts:", error);
             }
         };
         fetchPosts();

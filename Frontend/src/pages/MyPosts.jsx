@@ -10,7 +10,6 @@ function AllPosts() {
     const userData = useSelector((state)=> state.auth.userData)
     const dispatch = useDispatch()
     const [loading, setLoading] = useState(false);
-    // console.log(userData._id);
     useEffect(() => {
         const fetchPosts = async () => {
             try {
@@ -31,7 +30,6 @@ function AllPosts() {
                 else {
                     const error = await response.json();
                     console.log(error);
-                    dispatch(UserPost())
                     setLoading(false);
                 }
             } catch (error) {

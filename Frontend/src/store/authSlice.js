@@ -18,7 +18,7 @@ const authSlice = createSlice({
         },
         toggleloggedin: (state)=>{
             console.log("The userData stored in the redux is: ", state.userData, " And the user is :", state.IsLoggedIn);
-            state.IsLoggedIn =!state.IsLoggedIn
+            state.IsLoggedIn =!state.IsLoggedIn;
         }
      }
 })
