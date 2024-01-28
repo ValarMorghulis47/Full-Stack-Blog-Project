@@ -9,6 +9,7 @@ function Home() {
     console.log("Home component rendering");
     const [loading, setLoading] = useState(false);
     const AllPosts = useSelector((state) => state.post.AllPost)
+    console.log(AllPosts);
     const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
     const dispatch = useDispatch()
     useEffect(() => {

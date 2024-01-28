@@ -19,8 +19,10 @@ const postSlice = createSlice({
         },
         deletePost: (state, action) => {
             // Remove the deleted post from the state
-            const postIdToDelete = action.payload.postId;
+            const postIdToDelete = action.payload;
+            console.log("Deleting the post with the id: ", postIdToDelete);
             state.AllPost = state.AllPost.filter((post) => post._id !== postIdToDelete);
+            state.UserPost = state.UserPost.filter((post) => post._id !== postIdToDelete);
         },
         updatePost: (state, action) => {
             // Update the content of the post with the provided data
@@ -28,7 +30,9 @@ const postSlice = createSlice({
             const updatedPosts = state.AllPost.map((post) =>
                 post._id === postId ? { ...post, title, content, image, imagePublicId } : post
             );
+            console.log(updatedPosts);
             state.AllPost = updatedPosts;
+            state.UserPost = updatedPosts;
         },
         dataclear: (state) => {
             state.AllPost = [];

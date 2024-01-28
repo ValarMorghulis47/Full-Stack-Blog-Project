@@ -76,6 +76,8 @@ const updatePost = asyncHandler(async (req, res) => {
             image: postimg.url,
             imagePublicId: postimg.public_id
         }
+    }, {
+        new: true
     })
     if (!updatedPost) {
         const error = new ApiError(503, "Error while updating post");
