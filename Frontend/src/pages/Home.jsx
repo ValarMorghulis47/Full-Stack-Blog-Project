@@ -9,9 +9,18 @@ function Home() {
     console.log("Home component rendering");
     const [loading, setLoading] = useState(false);
     const AllPosts = useSelector((state) => state.post.AllPost)
-    console.log(AllPosts);
     const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
+    const theme = useSelector((state) => state.theme.mode);
     const dispatch = useDispatch()
+    let homeClassName = 'w-full py-8 text-center height';
+    let postClassName = 'w-full py-8 height';
+    let headingClassName = 'text-2xl font-bold hover:text-gray-500';
+
+    if (theme === 'dark') {
+      homeClassName += ' dark:bg-gray-950';
+      postClassName += ' dark:bg-gray-950';
+      headingClassName += ' dark:text-white' // Add the dark mode class if the theme is dark
+    }
     useEffect(() => {
         const fetchPosts = async () => {
             if (!AllPosts?.length) {
@@ -43,12 +52,12 @@ function Home() {
     }, [IsLoggedIn])
     if (IsLoggedIn === false) {
         return (
-            <div className="w-full py-8 text-center height" >
+            <div className={homeClassName} >
                 <Container>
                     {loading && <Loading />}
                     <div className="flex flex-wrap main-container">
                         <div className="p-7 w-full">
-                            <h1 className="text-2xl font-bold hover:text-gray-500">
+                            <h1 className={headingClassName}>
                                 Login To Read Posts
                             </h1>
                         </div>
@@ -60,12 +69,12 @@ function Home() {
 
     else if (AllPosts?.length == 0) {
         return (
-            <div className="w-full py-8 mt-4 text-center height">
+            <div className={homeClassName}>
                 <Container>
                     {loading && <Loading />}
                     <div className="flex flex-wrap">
                         <div className="p-2 w-full">
-                            <h1 className="text-2xl font-bold hover:text-gray-500">
+                            <h1 className={headingClassName}>
                                 Add a post to see one
                             </h1>
                         </div>
@@ -76,7 +85,7 @@ function Home() {
     }
     else {
         return (
-            <div className='w-full py-8 height'>
+            <div className={postClassName}>
                 <Container>
                     {loading && <Loading />}
                     <div className='flex flex-wrap'>

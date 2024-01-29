@@ -1,13 +1,21 @@
 import React from 'react'
 import { Container, Logo, LogoutBtn } from '../index'
 import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-
+import { toggleTheme } from '../../store/darkmodeSlice'
+import "../../App.css"
 function Header() {
   const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
+  const theme = useSelector((state) => state.theme.mode)
   const navigate = useNavigate()
-
+  const dispatch = useDispatch()
+  const handleclick = () => {
+    dispatch(toggleTheme('light'))
+  }
+  const handlelight = () => {
+    dispatch(toggleTheme('dark'))
+  }
   const navItems = [
     {
       name: 'Home',
@@ -63,6 +71,20 @@ function Header() {
                 <LogoutBtn />
               </li>
             )}
+             {
+              theme === 'dark' &&(
+                <button className="material-symbols-outlined py-7" onClick={handlelight}>
+                  light_mode
+                </button>
+              )
+            }
+            {
+              theme === 'light' &&(
+                <button className="material-symbols-outlined py-7" onClick={handleclick}>
+                  dark_mode
+                </button>
+              )
+            }
           </ul>
         </nav>
       </Container>
