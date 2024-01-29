@@ -10,9 +10,9 @@
     height: 6rem;
 }
 
-/* .hide{
-    display: none;
-} */
+.hide{
+    color: #fff;
+}
 
 #root {
     font-family: 'Kalnia', serif;

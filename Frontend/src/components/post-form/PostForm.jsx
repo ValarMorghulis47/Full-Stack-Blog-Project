@@ -23,6 +23,19 @@ export default function PostForm({ post }) {
   const userData = useSelector((state) => state.auth.userData);
   const allpost = useSelector((state) => state.post.AllPost)
   const userpost = useSelector((state) => state.post.UserPost)
+  const theme = useSelector((state) => state.theme.mode);
+  let mainClassName = 'flex justify-center height';
+  let authorClassName = 'font-bold text-sm hover:text-gray-600 mt-2 ml-4';
+  let titleClassName = 'block text-gray-700 text-sm font-bold mb-4';
+  // let contentClassName = 'text-sm text-gray-500 mt-4 m-2';
+  let inputClassName = 'block text-gray-700 text-sm font-bold mb-4';
+
+  if (theme === 'dark') {
+    mainClassName += ' dark:bg-gray-950';
+    authorClassName += ' dark:text-white' // Add the dark mode class if the theme is dark
+    titleClassName = ' dark:text-white block text-sm font-bold mb-4' // Add the dark mode class if the theme is dark
+    contentClassName = ' dark:text-white text-sm mt-4 m-2' // Add the dark mode class if the theme is dark
+  }
   const submit = async (data) => {
     if (post) {
       setLoading(true);
@@ -133,7 +146,7 @@ export default function PostForm({ post }) {
         {loading && <Loading />}
       </div>
       <div className="w-2/3 px-2">
-      <label className="block text-gray-700 text-sm font-bold mb-4">Post Title :</label>
+        <label className={titleClassName}>Post Title :</label>
         <Input
           placeholder="Title"
           className="block text-gray-700 text-sm font-bold mb-4"

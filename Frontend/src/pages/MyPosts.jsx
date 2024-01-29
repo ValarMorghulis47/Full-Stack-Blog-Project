@@ -9,6 +9,16 @@ function AllPosts() {
     console.log("my post page mounted");
     const UserPosts = useSelector((state) => state.post.UserPost)
     const userData = useSelector((state) => state.auth.userData)
+    const theme = useSelector((state) => state.theme.mode);
+    let homeClassName = 'w-full py-8 text-center height';
+    let postClassName = 'w-full py-8 height';
+    let headingClassName = 'text-2xl font-bold hover:text-gray-500';
+
+    if (theme === 'dark') {
+      homeClassName += ' dark:bg-gray-950';
+      postClassName += ' dark:bg-gray-950';
+      headingClassName += ' dark:text-white' // Add the dark mode class if the theme is dark
+    }
     const dispatch = useDispatch()
     const [loading, setLoading] = useState(false);
     useEffect(() => {
@@ -46,12 +56,12 @@ function AllPosts() {
     }, [])
     if (UserPosts?.length == 0) {
         return (
-            <div className="w-full py-8 mt-4 text-center height">
+            <div className={homeClassName}>
                 <Container>
                     {loading && <Loading />}
                     <div className="flex flex-wrap">
                         <div className="p-2 w-full">
-                            <h1 className="text-2xl font-bold hover:text-gray-500">
+                            <h1 className={headingClassName}>
                                 Add a post to see one
                             </h1>
                         </div>
@@ -62,7 +72,7 @@ function AllPosts() {
     }
     else {
         return (
-            <div className='w-full py-8 height'>
+            <div className={postClassName}>
                 <Container>
                     {loading && <Loading />}
                     <div className='flex flex-wrap'>

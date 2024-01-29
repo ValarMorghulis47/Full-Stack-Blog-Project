@@ -84,7 +84,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { Button, Container } from "../components";
 import parse from "html-react-parser";
 import { useDispatch, useSelector } from "react-redux";
 import { deletePost as deletePostAction } from "../store/postSlice";
@@ -97,7 +96,19 @@ export default function Post() {
     const dispatch = useDispatch()
     const userData = useSelector((state) => state.auth.userData)
     const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
+    const theme = useSelector((state) => state.theme.mode);
     const isAuthor = post && userData ? post.authorDetails._id === userData._id : false;
+    let mainClassName = 'flex justify-center height';
+    let authorClassName = 'font-bold text-sm hover:text-gray-600 mt-2 ml-4';
+    let titleClassName = 'font-bold text-black text-xl m-2';
+    let contentClassName = 'text-sm text-gray-500 mt-4 m-2';
+
+    if (theme === 'dark') {
+        mainClassName += ' dark:bg-gray-950';
+        authorClassName += ' dark:text-white' // Add the dark mode class if the theme is dark
+        titleClassName = ' dark:text-white font-bold text-xl m-2' // Add the dark mode class if the theme is dark
+        contentClassName = ' dark:text-white text-sm mt-4 m-2' // Add the dark mode class if the theme is dark
+    }
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -135,7 +146,7 @@ export default function Post() {
     };
 
     return post ? (
-        <div className="flex justify-center height">
+        <div className={mainClassName}>
             <div className="flex flex-col justify-center">
                 <div className="flex flex-col md:flex-row w-screen justify-center items-center ">
                     <div className="overflow-hidden w-full m-4 shadow-sm flex flex-col md:flex-row justify-center">
@@ -146,7 +157,7 @@ export default function Post() {
                                     <div className="flex m-2 w-20">
                                         <img src={post.authorDetails.avatar} alt=""
                                             className=" rounded-full" />
-                                        <div className="font-bold text-sm hover:text-gray-600 mt-2 ml-4">{post.authorDetails.username}</div>
+                                        <div className={authorClassName}>{post.authorDetails.username}</div>
                                     </div>
                                     {isAuthor && (<div className="flex justify-between mr-4">
                                         <Link>
@@ -174,8 +185,8 @@ export default function Post() {
                                         </Link>
                                     </div>)}
                                 </div>
-                                <div className="font-bold text-black text-xl m-2">{post.title}</div>
-                                <div className="text-sm text-gray-500 mt-4 m-2">{parse(post.content)}</div>
+                                <div className={titleClassName}>{post.title}</div>
+                                <div className={contentClassName}>{parse(post.content)}</div>
                             </div>
                         </div>
                     </div>
