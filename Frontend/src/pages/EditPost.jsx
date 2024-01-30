@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { Container, PostForm } from '../components'
 import { useNavigate, useParams } from 'react-router-dom';
-
+import { useSelector } from 'react-redux';
 function EditPost() {
     const [post, setPost] = useState(null)
     const { slug } = useParams()
     const navigate = useNavigate()
+    const theme = useSelector((state) => state.theme.mode);
+    let homeClassName = 'py-8';
 
+    if (theme === 'dark') {
+        homeClassName += ' dark:bg-gray-950';
+    }
     useEffect(() => {
         const fetchPost = async () => {
             if (slug) {
@@ -29,7 +34,7 @@ function EditPost() {
         fetchPost();
     }, [slug, navigate])
     return post ? (
-        <div className='py-8'>
+        <div className={homeClassName}>
             <Container>
                 <PostForm post={post} />
             </Container>

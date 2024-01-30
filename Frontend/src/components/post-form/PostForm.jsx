@@ -25,16 +25,17 @@ export default function PostForm({ post }) {
   const userpost = useSelector((state) => state.post.UserPost)
   const theme = useSelector((state) => state.theme.mode);
   let mainClassName = 'flex justify-center height';
-  let authorClassName = 'font-bold text-sm hover:text-gray-600 mt-2 ml-4';
   let titleClassName = 'block text-gray-700 text-sm font-bold mb-4';
-  // let contentClassName = 'text-sm text-gray-500 mt-4 m-2';
-  let inputClassName = 'block text-gray-700 text-sm font-bold mb-4';
+  let contentClassName = 'block text-gray-700 text-sm font-bold mb-4';
+  let inputClassName = 'block text-gray-700 text-sm focus:outline-none font-bold mb-4';
+  let fileClassName = 'mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-black hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60';
 
   if (theme === 'dark') {
     mainClassName += ' dark:bg-gray-950';
-    authorClassName += ' dark:text-white' // Add the dark mode class if the theme is dark
+    inputClassName += ' dark:bg-gray-900' // Add the dark mode class if the theme is dark
     titleClassName = ' dark:text-white block text-sm font-bold mb-4' // Add the dark mode class if the theme is dark
-    contentClassName = ' dark:text-white text-sm mt-4 m-2' // Add the dark mode class if the theme is dark
+    contentClassName = ' dark:text-white block text-sm font-bold mb-4' // Add the dark mode class if the theme is dark
+    fileClassName = ' file:text-white mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60' // Add the dark mode class if the theme is dark
   }
   const submit = async (data) => {
     if (post) {
@@ -149,7 +150,7 @@ export default function PostForm({ post }) {
         <label className={titleClassName}>Post Title :</label>
         <Input
           placeholder="Title"
-          className="block text-gray-700 text-sm font-bold mb-4"
+          className={inputClassName}
           {...register("title", { required: true })}
         />
         {/* <Input
@@ -171,7 +172,7 @@ export default function PostForm({ post }) {
           accept="image/png, image/jpg, image/jpeg, image/gif"
           {...register("image", { required: !post })}
         /> */}
-        <label className="block text-gray-700 text-sm font-bold mb-4">Post Image</label>
+        <label className={contentClassName}>Post Image</label>
         <input id="example1" type="file" className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" {...register("image", { required: !post })} />
         {post && (
           <div className="w-full mb-4 mt-4">

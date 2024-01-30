@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toggleloggedin } from '../store/authSlice'
 import { Logo } from "./index"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { useForm } from "react-hook-form"
 import "../App.css"
 function Login() {
@@ -10,7 +10,16 @@ function Login() {
     const dispatch = useDispatch()
     const { register, handleSubmit } = useForm()
     const [error, setError] = useState("")
+    const theme = useSelector((state) => state.theme.mode);
+    let homeClassName = 'py-16 height';
+    let inputClassName = 'bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none';
+    // let headingClassName = 'text-2xl font-bold hover:text-gray-500';
 
+    if (theme === 'dark') {
+      homeClassName += ' dark:bg-gray-950';
+      inputClassName = ' dark:bg-gray-900 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none';
+    //   headingClassName += ' dark:text-white';
+    }
     const login = async (data) => {
         setError("")
         try {
@@ -37,7 +46,7 @@ function Login() {
     }
 
     return (
-        <div className="py-16 height">
+        <div className={homeClassName}>
             <form  onSubmit={handleSubmit(login)}>
                 {error && <p className="text-red-600 h-6 text-center">{error}</p>}
             <div className="flex overflow-hidden mx-auto max-w-sm lg:max-w-4xl items-center">
@@ -53,7 +62,7 @@ function Login() {
                     </div>
                     <div className="mt-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2">Email Address</label>
-                        <input className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="email" {...register("email", {
+                        <input className={inputClassName} type="email" {...register("email", {
                             required: true,
                             validate: {
                                 matchPatern: (value) => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
@@ -66,7 +75,7 @@ function Login() {
                             <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
                             <a href="#" className="text-xs text-gray-500">Forget Password?</a>
                         </div>
-                        <input className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="password" {...register("password", {
+                        <input className={inputClassName} type="password" {...register("password", {
                             required: true,
                         })} />
                     </div>

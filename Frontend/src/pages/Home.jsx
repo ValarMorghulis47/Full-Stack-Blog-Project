@@ -10,8 +10,8 @@ function Home() {
     const [loading, setLoading] = useState(false);
     const AllPosts = useSelector((state) => state.post.AllPost)
     const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
-    const theme = useSelector((state) => state.theme.mode);
     const dispatch = useDispatch()
+    const theme = useSelector((state) => state.theme.mode);
     let homeClassName = 'w-full py-8 text-center height';
     let postClassName = 'w-full py-8 height';
     let headingClassName = 'text-2xl font-bold hover:text-gray-500';
