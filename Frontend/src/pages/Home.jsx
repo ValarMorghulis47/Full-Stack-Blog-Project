@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { AllPost } from '../store/postSlice';
 function Home() {
     console.log("Home component rendering");
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const AllPosts = useSelector((state) => state.post.AllPost)
     const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
     const dispatch = useDispatch()
@@ -17,9 +17,9 @@ function Home() {
     let headingClassName = 'text-2xl font-bold hover:text-gray-500';
 
     if (theme === 'dark') {
-      homeClassName += ' dark:bg-gray-950';
-      postClassName += ' dark:bg-gray-950';
-      headingClassName += ' dark:text-white' // Add the dark mode class if the theme is dark
+        homeClassName += ' dark:bg-gray-950';
+        postClassName += ' dark:bg-gray-950';
+        headingClassName += ' dark:text-white' // Add the dark mode class if the theme is dark
     }
     useEffect(() => {
         const fetchPosts = async () => {
@@ -54,9 +54,9 @@ function Home() {
         return (
             <div className={homeClassName} >
                 <Container>
-                    {loading && <Loading />}
                     <div className="flex flex-wrap main-container">
-                        <div className="p-7 w-full">
+                        <div className="p-7 w-full flex flex-col items-center">
+                            {loading && <Loading />}
                             <h1 className={headingClassName}>
                                 Login To Read Posts
                             </h1>
@@ -71,9 +71,9 @@ function Home() {
         return (
             <div className={homeClassName}>
                 <Container>
-                    {loading && <Loading />}
                     <div className="flex flex-wrap">
-                        <div className="p-2 w-full">
+                        <div className="p-2 w-full flex flex-col items-center">
+                            {loading && <Loading />}
                             <h1 className={headingClassName}>
                                 Add a post to see one
                             </h1>
@@ -87,13 +87,15 @@ function Home() {
         return (
             <div className={postClassName}>
                 <Container>
-                    {loading && <Loading />}
-                    <div className='flex flex-wrap'>
+                    <div className='flex flex-wrap items-center'>
                         {AllPosts?.map((post) => (
                             <div key={post._id} className='p-2 w-1/4'>
                                 <PostCard {...post} />
                             </div>
                         ))}
+                        <div className="mx-auto">
+                            {loading && <Loading />}
+                        </div>
                     </div>
                 </Container>
             </div>
