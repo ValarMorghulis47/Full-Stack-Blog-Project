@@ -50,6 +50,11 @@ function Header() {
       slug: "/add-post",
       active: IsLoggedIn,
     },
+    {
+      name: "Profile",
+      slug: "/profile",
+      active: IsLoggedIn,
+    },
   ]
 
 
