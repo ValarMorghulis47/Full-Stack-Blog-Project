@@ -10,7 +10,6 @@ const modalSlice = createSlice({
     reducers: {
         toggleModal: (state) => {
             state.modal= !state.modal;
-            console.log("The state is: ", state.modal);
         },
     },
 });

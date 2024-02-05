@@ -28,7 +28,8 @@ function Home() {
                     console.log("use effect of home triggered");
                     const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/`, {
                         method: 'GET',
-                        credentials: 'include'
+                        credentials: 'include',
+                        cache: 'no-cache'
                     });
                     if (response.ok) {
                         console.log("i am in if");

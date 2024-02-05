@@ -11,16 +11,13 @@ const postSlice = createSlice({
     reducers: {
         AllPost: (state, action) => {
             state.AllPost = action.payload;
-            console.log("All Posts Are: ", state.AllPost);
         },
         UserPost: (state, action) => {
             state.UserPost = action.payload;
-            console.log("Users Posts Are: ", state.UserPost);
         },
         deletePost: (state, action) => {
             // Remove the deleted post from the state
             const postIdToDelete = action.payload;
-            console.log("Deleting the post with the id: ", postIdToDelete);
             state.AllPost = state.AllPost.filter((post) => post._id !== postIdToDelete);
             state.UserPost = state.UserPost.filter((post) => post._id !== postIdToDelete);
         },

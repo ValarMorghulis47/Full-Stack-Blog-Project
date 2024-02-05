@@ -16,14 +16,13 @@ function App() {
         method: 'GET',
         credentials: 'include'
       });
-      console.log("Response is ", response);
       if (response.ok) {
         console.log("i am in if");
         const userData = await response.json();
         dispatch(login(userData.data));
         // dispatch(toggleloggedin())
       } else {
-        console.log("I am in else in app");
+        // console.log("I am in else in app");
         // console.error("Error fetching current user:", response.status);
       }
     } catch (error) {

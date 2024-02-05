@@ -166,7 +166,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
         .limit(limit);
 
     if (!Posts.length) {
-        const error = new ApiError(410, "No Posts Found")
+        const error = new ApiError(404, "No Posts Found")
         return res.status(error.statusCode).json(error.toResponse());
     }
 
