@@ -96,7 +96,7 @@ const registerUser = asyncHandler(async (req, res) => {
 })
 
 const loginUser = asyncHandler(async (req, res) => {
-    const { email, password} = req.body;
+    const { email, password } = req.body;
     if ([email, password].some((field) => field?.trim() === "")) {
         const error = new ApiError(400, "All Fields Are Required");
         return res.status(error.statusCode).json(error.toResponse());
@@ -105,10 +105,10 @@ const loginUser = asyncHandler(async (req, res) => {
         const error = new ApiError(400, "Email is required");
         return res.status(error.statusCode).json(error.toResponse());
     }
-    const user = await User.findOne({email})
+    const user = await User.findOne({ email })
     if (!user) {
-       const error = new ApiError(408, "Invalid Email Or Password");
-       return res.status(error.statusCode).json(error.toResponse());
+        const error = new ApiError(408, "Invalid Email Or Password");
+        return res.status(error.statusCode).json(error.toResponse());
     }
     const isPasswordValid = await user.isPasswordCorrect(password);
     if (!isPasswordValid) {
@@ -121,7 +121,7 @@ const loginUser = asyncHandler(async (req, res) => {
         httpOnly: true,
         path: '/',
     };
-    
+
     return res.status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
@@ -229,15 +229,60 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 })
 
 const upDateUserDetails = asyncHandler(async (req, res) => {
+    console.log(req.body);
+    console.log(req.files);
     const { fullname, email, username } = req.body;
-    if (!(fullname && email && username)) {
-        const error = new ApiError(410, "All Fields Are Required");
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
+    const coverImageLocalPath = req.files?.coverimage?.[0]?.path;
+    if (!(fullname || email || username || avatarLocalPath || coverImageLocalPath)) {
+        const error = new ApiError(410, "Atleast One Field Is Required");
         return res.status(error.statusCode).json(error.toResponse());
     }
     const existedUser = await User.findOne({ username })
-    if (existedUser?.username === username) {
-        const error = new ApiError(408, "Username Already Exists");
+    if (existedUser?.username === username || existedUser?.email === email) {
+        const error = new ApiError(408, "Username or Email Already Exists");
         return res.status(error.statusCode).json(error.toResponse());
+    }
+    if (avatarLocalPath) {
+        const avatarFolder = "avatar";
+        const avatar = await uploadOnCloudinary(avatarLocalPath, avatarFolder);
+        if (!avatar) {
+            const error = new ApiError(408, "Error while uploading avatar file on cloudinary");
+            return res.status(error.statusCode).json(error.toResponse());
+        }
+        const user = await User.findById(req.user?._id).select("avatar");
+        const previousPublicId = user.avatarPublicId;
+        const updateduser = await User.findByIdAndUpdate(req.user?._id, {
+            $set: {
+                avatar: avatar.url
+            }
+        }, {
+            new: true
+        }).select("-password")
+        if (previousPublicId) {
+            await DeleteFileCloudinary(previousPublicId, avatarFolder);
+        }
+    }
+    if (coverImageLocalPath) {
+        const coverimageFolder = "coverimage";
+        const coverimage = await uploadOnCloudinary(coverImageLocalPath, coverimageFolder);
+        if (!coverimage) {
+            const error = new ApiError(408, "Error while uploading cover image file on cloudinary");
+            return res.status(error.statusCode).json(error.toResponse());
+        }
+        const user = await User.findById(req.user?._id).select("coverimage");
+        const previousPublicId = user.coverimagePublicId;
+        const updateduser = await User.findByIdAndUpdate(req.user?._id, {
+            $set: {
+                coverimage: coverimage.url
+            }
+        },
+            {
+                new: true
+            }).select("-password")
+        if (previousPublicId) {
+            await DeleteFileCloudinary(previousPublicId, coverimageFolder);
+        }
     }
     const user = await User.findByIdAndUpdate(req.user?._id, {
         $set: {
