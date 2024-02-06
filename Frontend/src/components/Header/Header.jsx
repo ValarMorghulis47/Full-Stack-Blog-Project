@@ -8,6 +8,7 @@ import "../../App.css"
 function Header() {
   const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
   const theme = useSelector((state) => state.theme.mode)
+  const userData = useSelector((state) => state.auth.userData)
   const navigate = useNavigate()
   const dispatch = useDispatch()
   let headerClassName = 'bg-gray-100';
@@ -52,7 +53,7 @@ function Header() {
     },
     {
       name: "Profile",
-      slug: "/profile",
+      slug: `/profile/${userData?.username}/${userData?._id}`,
       active: IsLoggedIn,
     },
   ]

@@ -347,6 +347,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
                 coverimage: 1,
                 username: 1,
                 email: 1,
+                password: 1,
             }
         }
     ])
