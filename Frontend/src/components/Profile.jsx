@@ -115,7 +115,6 @@ function Profile() {
     return (
         <section className={homeClassName}>
             <div className={`flex flex-col items-center ${loading ? 'loading' : ''}`}>
-                {/* <div className={`flex flex-col items-center`}> */}
                 <form encType='multipart/form-data' onSubmit={handleSubmit(update)}>
                     <div className="max-w-4xl w-full relative mx-auto p-6 rounded flex items-center justify-center">
                         <div className="spinner">
