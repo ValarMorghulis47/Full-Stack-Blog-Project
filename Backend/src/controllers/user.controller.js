@@ -238,10 +238,21 @@ const upDateUserDetails = asyncHandler(async (req, res) => {
         const error = new ApiError(410, "Atleast One Field Is Required");
         return res.status(error.statusCode).json(error.toResponse());
     }
-    const existedUser = await User.findOne({ username })
-    if (existedUser?.username === username || existedUser?.email === email) {
-        const error = new ApiError(408, "Username or Email Already Exists");
-        return res.status(error.statusCode).json(error.toResponse());
+    const currentUser = await User.findById(req.user._id);
+    if (username && username !== currentUser.username) {
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            const error = new ApiError(408, "Username Already Exists");
+            return res.status(error.statusCode).json(error.toResponse());
+        }
+    }
+
+    if (email && email !== currentUser.email) {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            const error = new ApiError(408, "Email Already Exists");
+            return res.status(error.statusCode).json(error.toResponse());
+        }
     }
     if (avatarLocalPath) {
         const avatarFolder = "avatar";
