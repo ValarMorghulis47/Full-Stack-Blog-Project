@@ -35,6 +35,7 @@
 
 .spinner {
     z-index: 60;
+    position: fixed;
 }
 
 .main {

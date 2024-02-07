@@ -5,7 +5,7 @@ import Logo from '../Logo'
 import "../../App.css"
 function Footer() {
     const theme = useSelector((state) => state.theme.mode)
-    let footerClassName = 'text-gray-400 body-font';
+    let footerClassName = 'text-gray-400 body-font bg-gray-100';
     let spanClassName = 'text-black ml-3 text-xl';
     if (theme === 'dark') {
         footerClassName += ' dark:bg-gray-950';

@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Logo } from './index.js'
+import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { set, useForm } from 'react-hook-form'
 import "../App.css"
 import { useEffect } from 'react'
+import Loading from "./Loading"
 function Profile() {
-    const navigate = useNavigate()
     const [loading, setLoading] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState("");
     const [coverImageUrl, setCoverImageUrl] = useState("");
@@ -14,9 +13,9 @@ function Profile() {
     const [initialEmail, setInitialEmail] = useState(null);
     const [initialFullname, setInitialFullname] = useState(null);
     const [error, setError] = useState("")
+    const [success, setSuccess] = useState("")
     const [editable, setEditable] = useState(false);
-    const [data, setData] = useState('');
-    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
+    const { register, handleSubmit, setValue } = useForm();
     const { id } = useParams();
     const theme = useSelector((state) => state.theme.mode);
     let homeClassName = 'bg-white';
@@ -38,8 +37,6 @@ function Profile() {
             });
             if (response.ok) {
                 const profileData = await response.json();
-                console.log(profileData.data);
-                setData(profileData.data);
                 setAvatarUrl(`${profileData.data.avatar}?${new Date().getTime()}`);
                 setCoverImageUrl(`${profileData.data.coverimage}?${new Date().getTime()}`);
                 setValue("fullname", profileData.data.fullname);
@@ -48,20 +45,28 @@ function Profile() {
                 setInitialUsername(profileData.data.username);
                 setInitialEmail(profileData.data.email);
                 setInitialFullname(profileData.data.fullname);
-            } else {
-                console.log(response.json());
-                console.error("Error fetching current user:", response.status);
             }
         } catch (error) {
             // Handle errors here
-            console.error("Error fetching current user:", error);
         }
     };
     useEffect(() => {
         fetchProfile();
     }, [!editable])
-    const create = async (data) => {
+    const [showMessage, setShowMessage] = useState(true);
+    useEffect(() => {
+        if (error || success) {
+            setShowMessage(true);
+            const timer = setTimeout(() => {
+                setShowMessage(false);
+            }, 5000); // Change this value to adjust the time
+
+            return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
+        }
+    }, [error, success]);
+    const update = async (data) => {
         setError("");
+        setSuccess("");
         try {
             setLoading(true);
             const formData = new FormData();
@@ -75,7 +80,6 @@ function Profile() {
             }
 
             if (initialUsername !== data?.username) {
-                console.log(username);
                 formData.append('username', data.username);
             }
             if (data?.coverimage[0]) {
@@ -96,31 +100,31 @@ function Profile() {
             if (!userData.ok) {
                 const error = await userData.json();
                 setError(error.error.message);
+                setEditable(!editable);
                 setLoading(false);
                 return;
             }
             setLoading(false);
+            setSuccess("Profile updated successfully");
             setEditable(!editable);
         } catch (error) {
             setError(error.message);
         }
 
-    };
-    const fullname = watch("fullname");
-    const email = watch("email");
-    const username = watch("username");
-    const avatar = watch("avatar");
-    const coverimage = watch("coverimage");
-    console.log("The username is:", username);
+    }
     return (
         <section className={homeClassName}>
             <div className={`flex flex-col items-center ${loading ? 'loading' : ''}`}>
-                <form encType='multipart/form-data' onSubmit={handleSubmit(create)}>
-                    <div className="max-w-4xl w-full relative mx-auto p-6 rounded">
+                {/* <div className={`flex flex-col items-center`}> */}
+                <form encType='multipart/form-data' onSubmit={handleSubmit(update)}>
+                    <div className="max-w-4xl w-full relative mx-auto p-6 rounded flex items-center justify-center">
+                        <div className="spinner">
+                            {loading && <Loading />}
+                        </div>
                         <div className="w-full h-full">
                             <img className="w-full h-full" src={coverImageUrl} alt="avatar" />
                         </div>
-                        <div className="w-24 h-24 bg-white rounded-full p-3 absolute sm:-bottom-14 -bottom-10 left-0 cursor-pointer" style={{ width: '11rem', height: '10rem' }}>
+                        <div className="w-24 h-24 bg-white rounded-full p-3 absolute sm:-bottom-14 -bottom-10 left-0" style={{ width: '11rem', height: '10rem' }}>
                             <img className="w-full h-full rounded-full" src={avatarUrl} alt="avatar" />
                         </div>
                         {editable && <div className=' bg-green-600 hover:bg-amber-600 p-3 rounded-full drop-shadow-md absolute sm:bottom-6 -bottom-10 right-6 cursor-pointer'>
@@ -145,9 +149,12 @@ function Profile() {
                         </div>}
 
                     </div>
-                    <div className="flex items-center w-full max-w-3xl p-8 lg:px-12 lg:w-3/5">
+                    <div className="flex items-center w-full max-w-4xl p-8">
                         <div className="w-full pt-10">
-                            {error && <p classNameName="text-red-600 mt-8 text-center">{error}</p>}
+                            <div style={{ height: '40px' }}>
+                                {showMessage && error && <p className="text-red-600 text-center">{error}</p>}
+                                {showMessage && success && <p className="text-green-600 text-center">{success}</p>}
+                            </div>
                             <div>
                                 <label className="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
                                 <input className={inputClassName} type="text" readOnly={!editable} {...register("fullname")} />
@@ -163,7 +170,7 @@ function Profile() {
                                 <input className={inputClassName} type="text" readOnly={!editable} {...register("username")} />
                             </div>
                             {editable && <button
-                                className="flex items-center justify-between w-full px-6 py-3 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 mt-4">
+                                className="flex items-center justify-between px-6 py-3 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 mt-4">
                                 <span>Save Changes</span>
 
                                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 rtl:-scale-x-100" viewBox="0 0 20 20" fill="currentColor">
@@ -173,7 +180,7 @@ function Profile() {
                                 </svg>
                             </button>}
                             {!editable && <button
-                                className="flex items-center justify-between w-1/2 px-6 py-3 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 mt-4" onClick={handleclick}>
+                                className="flex items-center justify-between px-6 py-3 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 mt-4" onClick={handleclick}>
                                 <span>Edit Profile</span>
 
                                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 rtl:-scale-x-100" viewBox="0 0 20 20" fill="currentColor">

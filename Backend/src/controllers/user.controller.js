@@ -229,13 +229,11 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 })
 
 const upDateUserDetails = asyncHandler(async (req, res) => {
-    console.log(req.body);
-    console.log(req.files);
     const { fullname, email, username } = req.body;
     const avatarLocalPath = req.files?.avatar?.[0]?.path;
     const coverImageLocalPath = req.files?.coverimage?.[0]?.path;
     if (!(fullname || email || username || avatarLocalPath || coverImageLocalPath)) {
-        const error = new ApiError(410, "Atleast One Field Is Required");
+        const error = new ApiError(410, "Atleast One Field Is Required To Update The Account");
         return res.status(error.statusCode).json(error.toResponse());
     }
     const currentUser = await User.findById(req.user._id);
