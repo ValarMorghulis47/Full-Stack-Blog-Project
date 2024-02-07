@@ -15,9 +15,9 @@ function AllPosts() {
     let headingClassName = 'text-2xl font-bold hover:text-gray-500';
 
     if (theme === 'dark') {
-      homeClassName += ' dark:bg-gray-950';
-      postClassName += ' dark:bg-gray-950';
-      headingClassName += ' dark:text-white' // Add the dark mode class if the theme is dark
+        homeClassName += ' dark:bg-gray-950';
+        postClassName += ' dark:bg-gray-950';
+        headingClassName += ' dark:text-white' // Add the dark mode class if the theme is dark
     }
     const dispatch = useDispatch()
     const [loading, setLoading] = useState(false);
@@ -30,7 +30,6 @@ function AllPosts() {
                     const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/user/${userData._id}`, {
                         method: 'GET',
                         credentials: 'include',
-                        cache: 'no-cache'
                     })
                     // console.log(await response.json());
                     if (response.ok) {
@@ -56,11 +55,13 @@ function AllPosts() {
     }, [])
     if (UserPosts?.length == 0) {
         return (
-            <div className={homeClassName}>
+            <div className={homeClassName} >
                 <Container>
-                    {loading && <Loading />}
-                    <div className="flex flex-wrap">
-                        <div className="p-2 w-full">
+                    <div className="flex flex-wrap main-container">
+                        <div className="p-7 w-full flex flex-col items-center">
+                            <div className="spinner">
+                                {loading && <Loading />}
+                            </div>
                             <h1 className={headingClassName}>
                                 Add a post to see one
                             </h1>
@@ -73,17 +74,21 @@ function AllPosts() {
     else {
         return (
             <div className={postClassName}>
-                <Container>
-                    {loading && <Loading />}
-                    <div className='flex flex-wrap'>
-                        {UserPosts?.map((post) => (
-                            <div key={post._id} className='p-2 w-1/4'>
-                                <PostCard {...post} />
-                            </div>
-                        ))}
+            <Container>
+                <div className='flex flex-wrap'>
+                    {UserPosts?.map((post) => (
+                        <div key={post._id} className='p-2 w-1/4'>
+                            <PostCard {...post} />
+                        </div>
+                    ))}
+                </div>
+                <div className="flex justify-center">
+                    <div className="spinner">
+                        {loading && <Loading />}
                     </div>
-                </Container>
-            </div>
+                </div>
+            </Container>
+        </div>
         )
     }
 }

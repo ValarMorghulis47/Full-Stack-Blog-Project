@@ -57,7 +57,9 @@ function Home() {
                 <Container>
                     <div className="flex flex-wrap main-container">
                         <div className="p-7 w-full flex flex-col items-center">
-                            {loading && <Loading />}
+                            <div className="spinner">
+                                {loading && <Loading />}
+                            </div>
                             <h1 className={headingClassName}>
                                 Login To Read Posts
                             </h1>
@@ -74,7 +76,9 @@ function Home() {
                 <Container>
                     <div className="flex flex-wrap">
                         <div className="p-2 w-full flex flex-col items-center">
-                            {loading && <Loading />}
+                            <div className="spinner">
+                                {loading && <Loading />}
+                            </div>
                             <h1 className={headingClassName}>
                                 Add a post to see one
                             </h1>
@@ -88,13 +92,15 @@ function Home() {
         return (
             <div className={postClassName}>
                 <Container>
-                    <div className='flex flex-wrap items-center'>
+                    <div className='flex flex-wrap'>
                         {AllPosts?.map((post) => (
                             <div key={post._id} className='p-2 w-1/4'>
                                 <PostCard {...post} />
                             </div>
                         ))}
-                        <div className="mx-auto">
+                    </div>
+                    <div className="flex justify-center">
+                        <div className="spinner">
                             {loading && <Loading />}
                         </div>
                     </div>
