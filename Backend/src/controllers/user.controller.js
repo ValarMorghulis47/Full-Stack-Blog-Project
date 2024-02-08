@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import ApiError from "../utils/ApiError.js"
 import { User } from "../models/user.model.js"
+import { Post } from "../models/post.model.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { DeleteFileCloudinary } from "../utils/DeleteFileCloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
@@ -420,17 +421,27 @@ const deleteUserAccount = asyncHandler(async (req, res) => {
         const error = new ApiError(400, "User Does Not Exist");
         return res.status(error.statusCode).json(error.toResponse());
     }
-    // const previousAvatarPublicId = user.avatar ? user.avatar.split("/").pop().split(".")[0] : null;
     const previousAvatarPublicId = user.avatarPublicId;
     const avatarFolder = "avatar";
     if (previousAvatarPublicId) {
         await DeleteFileCloudinary(previousAvatarPublicId, avatarFolder);
     }
-    const coverimageFolder = "coverimage";
     const previousCoverImagePublicId = user.coverimagePublicId
+    const coverimageFolder = "coverimage";
     if (previousCoverImagePublicId) {
         await DeleteFileCloudinary(previousCoverImagePublicId, coverimageFolder);
     }
+    // Delete user's posts and their images
+    const posts = await Post.find({ author: req.user?._id });
+    for (const post of posts) {
+        const postImagePublicId = post.imagePublicId;
+        const postImageFolder = "post";
+        if (postImagePublicId) {
+            await DeleteFileCloudinary(postImagePublicId, postImageFolder);
+        }
+    }
+    await Post.deleteMany({ author: req.user?._id });
+
     await User.findByIdAndDelete(req.user?._id);
     return res.status(200).json(
         new ApiResponse(200, {}, "User Deleted Successfully")

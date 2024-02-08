@@ -99,14 +99,12 @@ export default function Post() {
     const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
     const theme = useSelector((state) => state.theme.mode);
     const modal = useSelector((state) => state.modal.modal)
-    console.log("The moda is: ", modal);
     const isAuthor = post && userData ? post.authorDetails._id === userData._id : false;
     let mainClassName = 'flex justify-center height';
     let authorClassName = 'font-bold text-sm hover:text-gray-600 mt-2 ml-4';
     let titleClassName = 'font-bold text-black text-xl m-2';
     let contentClassName = 'text-sm text-gray-500 mt-4 m-2';
     const handleclick = () => {
-        console.log("i am clicked");
         dispatch(toggleModal());
     }
 

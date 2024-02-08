@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { set, useForm } from 'react-hook-form'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { useForm } from 'react-hook-form'
 import "../App.css"
 import { useEffect } from 'react'
+import { toggleModal, toggleSuccess } from '../store/modalSlice'
 import Loading from "./Loading"
+import { toggleloggedin } from '../store/authSlice'
 function Profile() {
     const [loading, setLoading] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState("");
@@ -15,7 +17,10 @@ function Profile() {
     const [error, setError] = useState("")
     const [success, setSuccess] = useState("")
     const [editable, setEditable] = useState(false);
+    const navigate = useNavigate()
     const { register, handleSubmit, setValue } = useForm();
+    const dispatch = useDispatch();
+    const modal = useSelector((state) => state.modal.modal)
     const { id } = useParams();
     const theme = useSelector((state) => state.theme.mode);
     let homeClassName = 'bg-white';
@@ -110,12 +115,32 @@ function Profile() {
         } catch (error) {
             setError(error.message);
         }
-
+    }
+    const handlemodal = () => {
+        dispatch(toggleModal());
+    }
+    const deleteAccount = async () => {
+        try {
+            dispatch(toggleModal());
+            setLoading(true);
+            const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/users/delete-account`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if (response.ok) {
+                dispatch(toggleloggedin());
+                dispatch(toggleSuccess());
+                setLoading(false);
+                navigate('/');
+            }
+        } catch (error) {
+            setError(error.message);
+        }
     }
     return (
         <section className={homeClassName}>
             <div className={`flex flex-col items-center ${loading ? 'loading' : ''}`}>
-                <form encType='multipart/form-data' onSubmit={handleSubmit(update)}>
+                <form encType='multipart/form-data'>
                     <div className="max-w-4xl w-full relative mx-auto p-6 rounded flex items-center justify-center">
                         <div className="spinner">
                             {loading && <Loading />}
@@ -146,7 +171,65 @@ function Profile() {
                             </label>
                             <input type="file" id="avatarInput" className='hidden' accept='image/*' {...register("avatar")} />
                         </div>}
-
+                        {!editable && <span onClick={handlemodal} className="flex space-x-2 items-center cursor-pointer px-3 py-2 bg-rose-500 hover:bg-rose-800 rounded-md drop-shadow-md mr-3 absolute bottom-[-2rem] right-0">
+                            <svg className="fill-white" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20" viewBox="0 0 24 24">
+                                <path d="M 10 2 L 9 3 L 3 3 L 3 5 L 21 5 L 21 3 L 15 3 L 14 2 L 10 2 z M 4.3652344 7 L 5.8925781 20.263672 C 6.0245781 21.253672 6.877 22 7.875 22 L 16.123047 22 C 17.121047 22 17.974422 21.254859 18.107422 20.255859 L 19.634766 7 L 4.3652344 7 z"></path>
+                            </svg>
+                            <span className="text-white">Delete Account</span>
+                        </span>}
+                        {modal && <div
+                            data-te-modal-init
+                            className="fixed left-0 top-0 z-[1055] h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+                            id="exampleModalCenter"
+                            tabindex="-1"
+                            aria-labelledby="exampleModalCenterTitle"
+                            aria-modal="true"
+                            role="dialog">
+                            <div
+                                data-te-modal-dialog-ref
+                                className="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                                <div
+                                    className="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-white shadow-lg outline-none dark:bg-gray-900">
+                                    <div
+                                        className="flex flex-shrink-0 items-center justify-end rounded-t-md border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                                        <button
+                                            type="button"
+                                            onClick={handlemodal}
+                                            className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                                            data-te-modal-dismiss
+                                            aria-label="Close">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke-width="1.5"
+                                                stroke="currentColor"
+                                                className="h-6 w-6">
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div className="relative p-4">
+                                        <p>Are You Sure You Want To Delete Your Accoutn. You Wont Be Able To Get It Back!</p>
+                                    </div>
+                                    <div
+                                        className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                                        <button
+                                            type="button"
+                                            onClick={deleteAccount}
+                                            className="ml-1 inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
+                                            data-te-ripple-init
+                                            data-te-ripple-color="light">
+                                            Yes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        }
                     </div>
                     <div className="flex items-center w-full max-w-4xl p-8">
                         <div className="w-full pt-10">
@@ -169,7 +252,7 @@ function Profile() {
                                 <input className={inputClassName} type="text" readOnly={!editable} {...register("username")} />
                             </div>
                             {editable && <button
-                                className="flex items-center justify-between px-6 py-3 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 mt-4">
+                                className="flex items-center justify-between px-6 py-3 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 mt-4" onClick={handleSubmit(update)}>
                                 <span>Save Changes</span>
 
                                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 rtl:-scale-x-100" viewBox="0 0 20 20" fill="currentColor">

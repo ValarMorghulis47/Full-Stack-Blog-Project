@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import Loading from '../components/Loading';
 import { useState } from 'react';
 import { AllPost } from '../store/postSlice';
+import { toggleSuccess } from '../store/modalSlice';
 function Home() {
     console.log("Home component rendering");
     const [loading, setLoading] = useState(true);
@@ -12,6 +13,8 @@ function Home() {
     const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
     const dispatch = useDispatch()
     const theme = useSelector((state) => state.theme.mode);
+    const successmesj = useSelector((state) => state.modal.success);
+    const [showMessage, setShowMessage] = useState(true);
     let homeClassName = 'w-full py-8 text-center height';
     let postClassName = 'w-full py-8 height';
     let headingClassName = 'text-2xl font-bold hover:text-gray-500';
@@ -21,6 +24,17 @@ function Home() {
         postClassName += ' dark:bg-gray-950';
         headingClassName += ' dark:text-white' // Add the dark mode class if the theme is dark
     }
+    useEffect(() => {
+        if (successmesj) {
+            setShowMessage(true);
+            const timer = setTimeout(() => {
+                setShowMessage(false);
+                dispatch(toggleSuccess());
+            }, 5000); // Change this value to adjust the time
+
+            return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
+        }
+    }, [successmesj]);
     useEffect(() => {
         const fetchPosts = async () => {
             if (!AllPosts?.length) {
@@ -57,6 +71,9 @@ function Home() {
                 <Container>
                     <div className="flex flex-wrap main-container">
                         <div className="p-7 w-full flex flex-col items-center">
+                        <div style={{ height: '40px' }}>
+                                {showMessage && successmesj && <p className="text-green-600 text-center">Your Account Has Been Deleted Successfully</p>}
+                            </div>
                             <div className="spinner">
                                 {loading && <Loading />}
                             </div>

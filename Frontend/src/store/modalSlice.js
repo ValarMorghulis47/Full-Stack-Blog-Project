@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    modal: false, // Get initial mode from localStorage
+    modal: false,
+    success: false,
 };
 
 const modalSlice = createSlice({
@@ -11,9 +12,12 @@ const modalSlice = createSlice({
         toggleModal: (state) => {
             state.modal= !state.modal;
         },
+        toggleSuccess: (state) => {
+            state.success = !state.success;
+        },
     },
 });
 
-export const { toggleModal } = modalSlice.actions;
+export const { toggleModal, toggleSuccess } = modalSlice.actions;
 
 export default modalSlice.reducer;
