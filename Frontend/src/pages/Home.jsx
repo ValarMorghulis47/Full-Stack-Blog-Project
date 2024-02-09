@@ -46,7 +46,6 @@ function Home() {
                         cache: 'no-cache'
                     });
                     if (response.ok) {
-                        console.log("i am in if");
                         const postsData = await response.json();
                         dispatch(AllPost(postsData.data))
                         setLoading(false);

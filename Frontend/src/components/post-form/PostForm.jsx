@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { AllPost, updatePost as update, UserPost } from "../../store/postSlice";
 import { useDispatch } from 'react-redux';
 import Loading from '../Loading';
+import { toggleSuccess } from "../../store/modalSlice";
 
 export default function PostForm({ post }) {
   const { register, handleSubmit, watch, setValue, control, getValues } = useForm({
@@ -39,7 +40,6 @@ export default function PostForm({ post }) {
     fileClassName = ' file:text-white mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60' // Add the dark mode class if the theme is dark
   }
   const submit = async (data) => {
-    console.log("I am in submit");
     if (post) {
       setError("");
       try {
@@ -58,6 +58,7 @@ export default function PostForm({ post }) {
         })
 
         if (!updatePost.ok) {
+          const error = await responseData.json()
           setError(error.error.message);
           setLoading(false);
         }
@@ -71,6 +72,7 @@ export default function PostForm({ post }) {
           imagePublicId: jsonPost.data.imagePublicId,
         }));
         setLoading(false);
+        dispatch(toggleSuccess());
         navigate(`/post/${jsonPost.data._id}`)
       } catch (error) {
         setError(error.message);
@@ -146,22 +148,22 @@ export default function PostForm({ post }) {
 
   return (
     <>
-    <div style={{ height: '40px' }}>
-    {showMessage && error && <p className="text-red-600 text-center">{error}</p>}
-  </div>
-    <form onSubmit={handleSubmit(submit)} className={`flex flex-wrap justify-center ${loading ? 'loading' : ''}`} encType='multipart/form-data'>
-      <div className="spinner">
-        {loading && <Loading />}
+      <div style={{ height: '40px' }}>
+        {showMessage && error && <p className="text-red-600 text-center">{error}</p>}
       </div>
-     
-      <div className="w-2/3 px-2">
-        <label className={titleClassName}>Post Title :</label>
-        <Input
-          placeholder="Title"
-          className={inputClassName}
-          {...register("title")}
-        />
-        {/* <Input
+      <form onSubmit={handleSubmit(submit)} className={`flex flex-wrap justify-center ${loading ? 'loading' : ''}`} encType='multipart/form-data'>
+        <div className="spinner">
+          {loading && <Loading />}
+        </div>
+
+        <div className="w-2/3 px-2">
+          <label className={titleClassName}>Post Title :</label>
+          <Input
+            placeholder="Title"
+            className={inputClassName}
+            {...register("title")}
+          />
+          {/* <Input
           label="Slug :"
           placeholder="Slug"
           className="mb-4"
@@ -170,38 +172,38 @@ export default function PostForm({ post }) {
             setValue("slug", slugTransform(e.currentTarget.value), { shouldValidate: true });
           }}
         /> */}
-        <RTE label="Content :" name="content" control={control} defaultValue={getValues("content")} />
-      </div>
-      <div className="w-1/3 px-2">
-        {/* <Input
+          <RTE label="Content :" name="content" control={control} defaultValue={getValues("content")} />
+        </div>
+        <div className="w-1/3 px-2">
+          {/* <Input
           label="Featured Image :"
           type="file"
           className="mb-4"
           accept="image/png, image/jpg, image/jpeg, image/gif"
           {...register("image", { required: !post })}
         /> */}
-        <label className={contentClassName}>Post Image</label>
-        <input id="example1" type="file" className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" {...register("image")} />
-        {post && (
-          <div className="w-full mb-4 mt-4">
-            <img
-              src={post.image}
-              alt={post.title}
-              className="rounded-lg"
-            />
-          </div>
-        )}
-        {/* <Select
+          <label className={contentClassName}>Post Image</label>
+          <input id="example1" type="file" className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" {...register("image")} />
+          {post && (
+            <div className="w-full mb-4 mt-4">
+              <img
+                src={post.image}
+                alt={post.title}
+                className="rounded-lg"
+              />
+            </div>
+          )}
+          {/* <Select
           options={["active", "inactive"]}
           label="Status"
           className="mb-4"
           {...register("status", { required: true })}
         /> */}
-        <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full mt-4">
-          {post ? "Update" : "Submit"}
-        </Button>
-      </div>
-    </form>
-  </>
+          <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full mt-4">
+            {post ? "Update" : "Submit"}
+          </Button>
+        </div>
+      </form>
+    </>
   );
 }

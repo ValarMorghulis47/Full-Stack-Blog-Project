@@ -97,7 +97,9 @@ export default function Post() {
     const dispatch = useDispatch()
     const userData = useSelector((state) => state.auth.userData)
     const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
+    const success = useSelector((state) => state.modal.success)
     const theme = useSelector((state) => state.theme.mode);
+    const [showMessage, setShowMessage] = useState(true);
     const modal = useSelector((state) => state.modal.modal)
     const isAuthor = post && userData ? post.authorDetails._id === userData._id : false;
     let mainClassName = 'flex justify-center height';
@@ -114,7 +116,6 @@ export default function Post() {
         titleClassName = ' dark:text-white font-bold text-xl m-2' // Add the dark mode class if the theme is dark
         contentClassName = ' dark:text-white text-sm mt-4 m-2' // Add the dark mode class if the theme is dark
     }
-
     useEffect(() => {
         const fetchPost = async () => {
             if (slug) {
@@ -143,16 +144,27 @@ export default function Post() {
             credentials: 'include'
         })
         if (response.status === 200) {
-            console.log("The slug is: ", slug);
             dispatch(deletePostAction(slug))
             navigate('/')
         }
 
     };
+    React.useEffect(() => {
+        if (success) {
+            setShowMessage(true);
+            const timer = setTimeout(() => {
+                setShowMessage(false);
+            }, 3000); // Change this value to adjust the time
 
+            return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
+        }
+    }, [success]);
     return post ? (
         <div className={mainClassName}>
             <div className="flex flex-col justify-center">
+                <div style={{ height: '40px' }}>
+                    {showMessage && success && <p className="text-green-600 text-center">Post Has Been Updated Successfully</p>}
+                </div>
                 <div className="flex flex-col md:flex-row w-screen justify-center items-center ">
                     <div className="overflow-hidden w-full m-4 shadow-sm flex flex-col md:flex-row justify-center">
                         <div className="flex flex-col md:flex-row">
