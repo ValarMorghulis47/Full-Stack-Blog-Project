@@ -114,16 +114,20 @@
 
 // export default Signup
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button, Input, Logo } from './index.js'
 import { useDispatch, useSelector } from 'react-redux'
+import Loading from "./Loading"
 import { useForm } from 'react-hook-form'
 import "../App.css"
 function Signup() {
     const navigate = useNavigate()
     const [error, setError] = useState("")
-    const { register, handleSubmit } = useForm()
+    const [success, setSuccess] = useState("")
+    const [loading, setLoading] = useState(false);
+    const [showMessage, setShowMessage] = useState(true);
+    const { register, handleSubmit, reset } = useForm()
     const theme = useSelector((state) => state.theme.mode);
     let homeClassName = 'bg-white';
     let inputClassName = 'bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none';
@@ -136,6 +140,7 @@ function Signup() {
     const create = async (data) => {
         setError("");
         try {
+            setLoading(true);
             const formData = new FormData();
 
             // Append JSON data
@@ -155,27 +160,47 @@ function Signup() {
             if (!userData.ok) {
                 const error = await userData.json();
                 setError(error.error.message);
+                setLoading(false);
                 return;
             }
-            navigate("/");
+            setSuccess("Account created successfully");
+            setLoading(false);
+            reset();
+            // navigate("/");
         } catch (error) {
+            setLoading(false);
             setError(error.message);
         }
 
     };
+    useEffect(() => {
+        if (error || success) {
+            setShowMessage(true);
+            const timer = setTimeout(() => {
+                setShowMessage(false);
+                setSuccess("");
+            }, 3000); // Change this value to adjust the time
 
+            return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
+        }
+    }, [error, success]);
 
     return (
         <section className={homeClassName}>
-            <div className="flex justify-evenly height items-center">
+            <div className={`flex justify-evenly height items-center ${loading ? 'loading' : ''}`}>
                 <div className="hidden bg-cover lg:block lg:w-2/5">
                     <Logo width='100%' />
                 </div>
-
+                <div className="spinner">
+                    {loading && <Loading />}
+                </div>
                 <div className="flex items-center w-full max-w-3xl p-8 lg:px-12 lg:w-3/5">
                     <div className="w-full">
+                        <div style={{ height: '40px' }}>
+                            {showMessage && error && <p className="text-red-600 text-center">{error}</p>}
+                            {showMessage && success && <p className="text-green-600 text-center">{success}</p>}
+                        </div>
                         <h2 className="text-2xl font-semibold text-gray-700 text-center">ValarMorghulis</h2>
-                        {error && <p classNameName="text-red-600 mt-8 text-center">{error}</p>}
                         <form className="grid grid-cols-1 gap-6 mt-8 md:grid-cols-2" onSubmit={handleSubmit(create)} encType='multipart/form-data'>
                             <div>
                                 <label className="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
