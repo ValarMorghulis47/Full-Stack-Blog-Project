@@ -17,6 +17,7 @@ export default function PostForm({ post }) {
     },
   });
   const [loading, setLoading] = useState(false);
+  const [showMessage, setShowMessage] = useState(true);
   const dispatch = useDispatch()
   const [error, setError] = useState("")
   const navigate = useNavigate();
@@ -38,38 +39,43 @@ export default function PostForm({ post }) {
     fileClassName = ' file:text-white mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60' // Add the dark mode class if the theme is dark
   }
   const submit = async (data) => {
+    console.log("I am in submit");
     if (post) {
-      setLoading(true);
-      const formData = new FormData();
+      setError("");
+      try {
+        setLoading(true);
+        const formData = new FormData();
 
-      // Append JSON data
-      formData.append('title', data.title);
-      formData.append('content', data.content);
-      // Append file data
-      formData.append('image', data.image[0]);
-      const updatePost = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/${post._id}`, {
-        method: "PATCH",
-        body: formData,
-        credentials: 'include'
-      })
+        // Append JSON data
+        formData.append('title', data?.title);
+        formData.append('content', data?.content);
+        // Append file data
+        formData.append('image', data?.image[0]);
+        const updatePost = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/${post._id}`, {
+          method: "PATCH",
+          body: formData,
+          credentials: 'include'
+        })
 
-      if (!updatePost.ok) {
-        console.error("Failed to update post:", updatePost.status, await updatePost.text());
+        if (!updatePost.ok) {
+          setError(error.error.message);
+          setLoading(false);
+        }
+        const jsonPost = await updatePost.json();
+        // Dispatch the updatePost action after successfully updating the post on the server
+        dispatch(update({
+          postId: post._id,
+          title: data.title,
+          content: data.content,
+          image: jsonPost.data.image,
+          imagePublicId: jsonPost.data.imagePublicId,
+        }));
         setLoading(false);
-
+        navigate(`/post/${jsonPost.data._id}`)
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
       }
-      const jsonPost = await updatePost.json();
-      console.log("Updated Successful:", jsonPost);
-      // Dispatch the updatePost action after successfully updating the post on the server
-      dispatch(update({
-        postId: post._id,
-        title: data.title,
-        content: data.content,
-        image: jsonPost.data.image,
-        imagePublicId: jsonPost.data.imagePublicId,
-      }));
-      setLoading(false);
-      navigate(`/post/${jsonPost.data._id}`)
       // Other actions if needed
     } else {
       setLoading(true);
@@ -78,47 +84,44 @@ export default function PostForm({ post }) {
         const formData = new FormData();
 
         // Append JSON data
-        formData.append('title', data.title);
-        formData.append('content', data.content);
+        formData.append('title', data?.title);
+        formData.append('content', data?.content);
         // Append file data
-        formData.append('image', data.image[0]);
-        const userData = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/`, {
+        formData.append('image', data?.image[0]);
+        console.log(formData);
+        const responseData = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/`, {
           method: "POST",
           body: formData,
           credentials: 'include'
         });
 
-        if (!userData.ok) {
-          console.error("Server Error:", userData.status, await userData.text());
-          setError("An error occurred during registration. Please try again.");
+        if (!responseData.ok) {
+          const error = await responseData.json()
+          setError(error.error.message);
+          setLoading(false);
           return;
         }
-        const postData = await userData.json();
-        console.log("Registration Successful:", postData);
+        const postData = await responseData.json();
         dispatch(AllPost([postData.data, ...allpost]));  // Update the state by adding the new post
         dispatch(UserPost(userpost ? [postData.data, ...userpost] : [postData.data]));
         navigate(`/post/${postData.data._id}`);
       } catch (error) {
-        console.error("Error:", error.message);
-        setError("An unexpected error occurred. Please try again.");
+        console.log(error);
+        setError(error.message);
+        setLoading(false);
       }
-      // const file = await appwriteService.uploadFile(data.image[0]);
-
-      // if (file) {
-      //   const fileId = file.$id;
-      //   data.featuredImage = fileId;
-      //   console.log(userData.$id)
-      //   const dbPost = await appwriteService.createPost({ ...data, userid: userData.$id });
-
-      //   if (dbPost) {
-      //     dispatch(postdata({ postData: [...postData, dbPost] }));
-      //     dispatch(AllPost({ AllPost: [...allpost, dbPost] }));
-      //     setLoading(false);
-      //     navigate(`/post/${dbPost.$id}`);
-      //   }
-      // }
     }
   };
+  React.useEffect(() => {
+    if (error) {
+      setShowMessage(true);
+      const timer = setTimeout(() => {
+        setShowMessage(false);
+      }, 3000); // Change this value to adjust the time
+
+      return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
+    }
+  }, [error]);
 
   // const slugTransform = useCallback((value) => {
   //   if (value && typeof value === "string")
@@ -142,16 +145,21 @@ export default function PostForm({ post }) {
   // }, [watch, slugTransform, setValue]);
 
   return (
-    <form onSubmit={handleSubmit(submit)} className={`flex flex-wrap ${loading ? 'loading' : ''}`} encType='multipart/form-data'>
+    <>
+    <div style={{ height: '40px' }}>
+    {showMessage && error && <p className="text-red-600 text-center">{error}</p>}
+  </div>
+    <form onSubmit={handleSubmit(submit)} className={`flex flex-wrap justify-center ${loading ? 'loading' : ''}`} encType='multipart/form-data'>
       <div className="spinner">
         {loading && <Loading />}
       </div>
+     
       <div className="w-2/3 px-2">
         <label className={titleClassName}>Post Title :</label>
         <Input
           placeholder="Title"
           className={inputClassName}
-          {...register("title", { required: true })}
+          {...register("title")}
         />
         {/* <Input
           label="Slug :"
@@ -173,7 +181,7 @@ export default function PostForm({ post }) {
           {...register("image", { required: !post })}
         /> */}
         <label className={contentClassName}>Post Image</label>
-        <input id="example1" type="file" className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" {...register("image", { required: !post })} />
+        <input id="example1" type="file" className="mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60" {...register("image")} />
         {post && (
           <div className="w-full mb-4 mt-4">
             <img
@@ -194,5 +202,6 @@ export default function PostForm({ post }) {
         </Button>
       </div>
     </form>
+  </>
   );
 }
