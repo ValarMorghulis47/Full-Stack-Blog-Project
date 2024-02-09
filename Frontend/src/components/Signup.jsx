@@ -115,14 +115,12 @@
 // export default Signup
 
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Logo } from './index.js'
 import { useSelector } from 'react-redux'
 import Loading from "./Loading"
 import { useForm } from 'react-hook-form'
 import "../App.css"
 function Signup() {
-    const navigate = useNavigate()
     const [error, setError] = useState("")
     const [success, setSuccess] = useState("")
     const [loading, setLoading] = useState(false);
