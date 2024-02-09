@@ -9,13 +9,12 @@ import Loading from '../Loading';
 import { toggleSuccess } from "../../store/modalSlice";
 
 export default function PostForm({ post }) {
+  const defaultValues = {
+    title: post?.title || "",
+    content: post?.content || "",
+  };
   const { register, handleSubmit, watch, setValue, control, getValues } = useForm({
-    defaultValues: {
-      title: post?.title || "",
-      // slug: post?.$id || "",
-      content: post?.content || "",
-      // status: post?.status || "active",
-    },
+    defaultValues: defaultValues,
   });
   const [loading, setLoading] = useState(false);
   const [showMessage, setShowMessage] = useState(true);
@@ -31,7 +30,6 @@ export default function PostForm({ post }) {
   let contentClassName = 'block text-gray-700 text-sm font-bold mb-4';
   let inputClassName = 'block text-gray-700 text-sm focus:outline-none font-bold mb-4';
   let fileClassName = 'mt-2 block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-teal-500 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-black hover:file:bg-teal-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60';
-
   if (theme === 'dark') {
     mainClassName += ' dark:bg-gray-950';
     inputClassName += ' dark:bg-gray-900' // Add the dark mode class if the theme is dark
@@ -45,12 +43,15 @@ export default function PostForm({ post }) {
       try {
         setLoading(true);
         const formData = new FormData();
-
-        // Append JSON data
-        formData.append('title', data?.title);
-        formData.append('content', data?.content);
-        // Append file data
-        formData.append('image', data?.image[0]);
+        if (defaultValues.title !== data.title) {
+          formData.append('title', data.title);
+        }
+        if (defaultValues.content !== data.content) {
+          formData.append('content', data.content);
+        }
+        if (data?.image[0]) {
+          formData.append('image', data.image[0]);
+        }
         const updatePost = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/${post._id}`, {
           method: "PATCH",
           body: formData,

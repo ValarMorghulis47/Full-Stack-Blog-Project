@@ -88,7 +88,7 @@ import parse from "html-react-parser";
 import { useDispatch, useSelector } from "react-redux";
 import { deletePost as deletePostAction } from "../store/postSlice";
 import Loading from '../components/Loading';
-import { toggleModal, togglePostDelete } from "../store/modalSlice";
+import { toggleModal, togglePostDelete, toggleSuccess } from "../store/modalSlice";
 import "../App.css"
 export default function Post() {
     console.log("Post page mounted");
@@ -155,14 +155,17 @@ export default function Post() {
         }
 
     };
-    if (success) {
-        setShowMessage(true);
-        const timer = setTimeout(() => {
-            setShowMessage(false);
-        }, 3000); // Change this value to adjust the time
-
-        return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
-    }
+    useEffect(() => {
+        if (success) {
+            setShowMessage(true);
+            const timer = setTimeout(() => {
+                setShowMessage(false);
+                dispatch(toggleSuccess());
+            }, 3000); // Change this value to adjust the time
+    
+            return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
+        }
+    }, [success])
     return post ? (
         <div className={mainClassName}>
             <div className="spinner">

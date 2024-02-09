@@ -30,6 +30,7 @@ function AllPosts() {
                     const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/user/${userData._id}`, {
                         method: 'GET',
                         credentials: 'include',
+                        cache: 'no-cache',
                     });
                     if (response.ok) {
                         const postsData = await response.json();

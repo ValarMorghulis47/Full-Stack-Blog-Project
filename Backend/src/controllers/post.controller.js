@@ -47,34 +47,40 @@ const updatePost = asyncHandler(async (req, res) => {
         return res.status(error.statusCode).json(error.toResponse());
     }
     const { title, content } = req.body;
+    const postimgLocalPath = req.file?.path;
     const existedpost = await Post.findById({ _id: postId });
     if (!existedpost) {
         const error = new ApiError(404, "Post Not Found");
         return res.status(error.statusCode).json(error.toResponse());
     }
-    if (!title || !content) {
-        const error = new ApiError(410, "Title or Content Is Missing");
+    if (!(title || content || postimgLocalPath)) {
+        const error = new ApiError(410, "Atleast One Field Is Required To Update The Post");
         return res.status(error.statusCode).json(error.toResponse());
     }
     const existedpostimg = existedpost.imagePublicId;
-    const postimgFolder = "post";
-    await DeleteFileCloudinary(existedpostimg, postimgFolder);
-    const postimgLocalPath = req.file?.path;
-    if (!postimgLocalPath) {
-        const error = new ApiError(408, "Post Image Is Required");
-        return res.status(error.statusCode).json(error.toResponse());
-    }
-    const postimg = await uploadOnCloudinary(postimgLocalPath, postimgFolder);
-    if (!postimg) {
-        const error = new ApiError(508, "Error while uploading post image file on cloudinary");
-        return res.status(error.statusCode).json(error.toResponse());
+    if (postimgLocalPath) {
+        const postimgFolder = "post";
+        const post = await uploadOnCloudinary(postimgLocalPath, postimgFolder);
+        if (!post) {
+            const error = new ApiError(408, "Error while uploading post file on cloudinary");
+            return res.status(error.statusCode).json(error.toResponse());
+        }
+        await Post.findByIdAndUpdate(postId, {
+            $set: {
+                image: post.url,
+                imagePublicId: post.public_id
+            }
+        }, {
+            new: true
+        }).select("-password")
+        if (existedpostimg) {
+            await DeleteFileCloudinary(existedpostimg, postimgFolder);
+        }
     }
     const updatedPost = await Post.findByIdAndUpdate(postId, {
         $set: {
             title,
-            content,
-            image: postimg.url,
-            imagePublicId: postimg.public_id
+            content
         }
     }, {
         new: true
