@@ -30,23 +30,18 @@ function AllPosts() {
                     const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/user/${userData._id}`, {
                         method: 'GET',
                         credentials: 'include',
-                    })
-                    // console.log(await response.json());
+                    });
                     if (response.ok) {
                         const postsData = await response.json();
-                        // console.log(postsData.data);
                         dispatch(UserPost(postsData.data))
                         setLoading(false);
                     }
                     else {
-                        const error = await response.json();
-                        console.log(error);
                         setLoading(false);
                     }
                 } catch (error) {
                     // Handle errors here
                     setLoading(false);
-                    console.error("Error fetching posts:", error);
                 }
             }
             setLoading(false)

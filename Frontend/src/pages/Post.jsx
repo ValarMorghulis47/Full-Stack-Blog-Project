@@ -87,11 +87,13 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import parse from "html-react-parser";
 import { useDispatch, useSelector } from "react-redux";
 import { deletePost as deletePostAction } from "../store/postSlice";
-import { toggleModal } from "../store/modalSlice";
+import Loading from '../components/Loading';
+import { toggleModal, togglePostDelete } from "../store/modalSlice";
 import "../App.css"
 export default function Post() {
     console.log("Post page mounted");
     const [post, setPost] = useState(null);
+    const [loading, setLoading] = useState(false);
     const { slug } = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch()
@@ -102,7 +104,7 @@ export default function Post() {
     const [showMessage, setShowMessage] = useState(true);
     const modal = useSelector((state) => state.modal.modal)
     const isAuthor = post && userData ? post.authorDetails._id === userData._id : false;
-    let mainClassName = 'flex justify-center height';
+    let mainClassName = 'flex justify-center items-center height';
     let authorClassName = 'font-bold text-sm hover:text-gray-600 mt-2 ml-4';
     let titleClassName = 'font-bold text-black text-xl m-2';
     let contentClassName = 'text-sm text-gray-500 mt-4 m-2';
@@ -139,29 +141,34 @@ export default function Post() {
     }, [slug, navigate, IsLoggedIn]);
 
     const deletePost = async () => {
+        dispatch(toggleModal());
+        setLoading(true);
         const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/${slug}`, {
             method: 'DELETE',
             credentials: 'include'
         })
         if (response.status === 200) {
             dispatch(deletePostAction(slug))
+            dispatch(togglePostDelete());
+            setLoading(false);
             navigate('/')
         }
 
     };
-    React.useEffect(() => {
-        if (success) {
-            setShowMessage(true);
-            const timer = setTimeout(() => {
-                setShowMessage(false);
-            }, 3000); // Change this value to adjust the time
+    if (success) {
+        setShowMessage(true);
+        const timer = setTimeout(() => {
+            setShowMessage(false);
+        }, 3000); // Change this value to adjust the time
 
-            return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
-        }
-    }, [success]);
+        return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
+    }
     return post ? (
         <div className={mainClassName}>
-            <div className="flex flex-col justify-center">
+            <div className="spinner">
+                {loading && <Loading />}
+            </div>
+            <div className={`flex flex-col justify-center ${loading ? 'loading' : ''}`}>
                 <div style={{ height: '40px' }}>
                     {showMessage && success && <p className="text-green-600 text-center">Post Has Been Updated Successfully</p>}
                 </div>

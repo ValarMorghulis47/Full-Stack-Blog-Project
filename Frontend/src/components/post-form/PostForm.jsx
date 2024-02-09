@@ -90,7 +90,6 @@ export default function PostForm({ post }) {
         formData.append('content', data?.content);
         // Append file data
         formData.append('image', data?.image[0]);
-        console.log(formData);
         const responseData = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/`, {
           method: "POST",
           body: formData,

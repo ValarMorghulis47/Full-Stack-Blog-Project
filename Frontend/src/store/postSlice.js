@@ -27,7 +27,6 @@ const postSlice = createSlice({
             const updatedPosts = state.AllPost.map((post) =>
                 post._id === postId ? { ...post, title, content, image, imagePublicId } : post
             );
-            console.log(updatedPosts);
             state.AllPost = updatedPosts;
             state.UserPost = updatedPosts;
         },
