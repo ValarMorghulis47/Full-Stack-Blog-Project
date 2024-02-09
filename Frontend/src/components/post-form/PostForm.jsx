@@ -59,9 +59,10 @@ export default function PostForm({ post }) {
         })
 
         if (!updatePost.ok) {
-          const error = await responseData.json()
+          const error = await updatePost.json()
           setError(error.error.message);
           setLoading(false);
+          return;
         }
         const jsonPost = await updatePost.json();
         // Dispatch the updatePost action after successfully updating the post on the server

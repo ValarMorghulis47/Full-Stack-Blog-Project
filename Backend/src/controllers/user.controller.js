@@ -260,11 +260,11 @@ const upDateUserDetails = asyncHandler(async (req, res) => {
             const error = new ApiError(408, "Error while uploading avatar file on cloudinary");
             return res.status(error.statusCode).json(error.toResponse());
         }
-        const user = await User.findById(req.user?._id).select("avatar");
-        const previousPublicId = user.avatarPublicId;
-        const updateduser = await User.findByIdAndUpdate(req.user?._id, {
+        const previousPublicId = currentUser.avatarPublicId;
+        await User.findByIdAndUpdate(req.user?._id, {
             $set: {
-                avatar: avatar.url
+                avatar: avatar.url,
+                avatarPublicId: avatar.public_id,
             }
         }, {
             new: true
@@ -280,11 +280,11 @@ const upDateUserDetails = asyncHandler(async (req, res) => {
             const error = new ApiError(408, "Error while uploading cover image file on cloudinary");
             return res.status(error.statusCode).json(error.toResponse());
         }
-        const user = await User.findById(req.user?._id).select("coverimage");
-        const previousPublicId = user.coverimagePublicId;
-        const updateduser = await User.findByIdAndUpdate(req.user?._id, {
+        const previousPublicId = currentUser.coverimagePublicId;
+        await User.findByIdAndUpdate(req.user?._id, {
             $set: {
-                coverimage: coverimage.url
+                coverimage: coverimage.url,
+                coverimagePublicId: coverimage.public_id
             }
         },
             {
