@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Button from './Button';
 import { useEffect } from 'react';
-const ProfileDetails = ({ editable, register, handleSubmit, update, handleclick, showMessage, error, success, inputClassName, updatePassword}) => {
+const ProfileDetails = ({ editable, register, handleSubmit, update, handleclick, showMessage, error, success, inputClassName, updatePassword }) => {
     const [isPasswordChange, setIsPasswordChange] = useState(false);
     useEffect(() => {
         setIsPasswordChange(false);
@@ -69,26 +69,28 @@ const ProfileDetails = ({ editable, register, handleSubmit, update, handleclick,
                             clipRule="evenodd" />
                     </svg>
                 </Button>}
-                {!editable && <Button
-                    className="flex items-center justify-between px-6 py-3 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 mt-4" onClick={()=>{handleclick()}}>
-                    <span>Edit Profile</span>
+                <div className='flex'>
+                    {!editable && <Button
+                        className="flex items-center justify-between px-6 py-3 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 mt-4" onClick={() => { handleclick() }}>
+                        <span>Edit Profile</span>
 
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 rtl:-scale-x-100" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd"
-                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                            clipRule="evenodd" />
-                    </svg>
-                </Button>}
-                {!editable && <Button
-                    className="flex items-center justify-between px-6 py-3 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 mt-4" onClick={()=>{setIsPasswordChange(true)}}>
-                    <span>Change Password</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 rtl:-scale-x-100" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd"
+                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                clipRule="evenodd" />
+                        </svg>
+                    </Button>}
+                    {!editable && <Button
+                        className="flex items-center justify-between ml-4 px-6 py-3 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 mt-4" onClick={() => { setIsPasswordChange(true) }}>
+                        <span>Change Password</span>
 
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 rtl:-scale-x-100" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd"
-                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                            clipRule="evenodd" />
-                    </svg>
-                </Button>}
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 rtl:-scale-x-100" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd"
+                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                clipRule="evenodd" />
+                        </svg>
+                    </Button>}
+                </div>
             </div>
         );
     }
