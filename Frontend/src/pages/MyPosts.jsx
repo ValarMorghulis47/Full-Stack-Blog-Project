@@ -55,9 +55,6 @@ function AllPosts() {
                 <Container>
                     <div className="flex flex-wrap main-container">
                         <div className="p-7 w-full flex flex-col items-center">
-                            <div className="spinner">
-                                {loading && <Loading />}
-                            </div>
                             <h1 className={headingClassName}>
                                 Add a post to see one
                             </h1>

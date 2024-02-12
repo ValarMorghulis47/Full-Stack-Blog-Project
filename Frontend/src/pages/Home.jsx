@@ -83,9 +83,6 @@ function Home() {
                                 {showMessage && successmesj && <p className="text-green-600 text-center">Your Account Has Been Deleted Successfully</p>}
                                 {showMessage && postDeleteMesj && <p className="text-green-600 text-center">Your Post Has Been Deleted Successfully</p>}
                             </div>
-                            <div className="spinner">
-                                {loading && <Loading />}
-                            </div>
                             <h1 className={headingClassName}>
                                 Login To Read Posts
                             </h1>
@@ -105,9 +102,6 @@ function Home() {
                             <div style={{ height: '40px' }}>
                                 {showMessage && successmesj && <p className="text-green-600 text-center">Your Account Has Been Deleted Successfully</p>}
                                 {showMessage && postDeleteMesj && <p className="text-green-600 text-center">Your Post Has Been Deleted Successfully</p>}
-                            </div>
-                            <div className="spinner">
-                                {loading && <Loading />}
                             </div>
                             <h1 className={headingClassName}>
                                 Add a post to see one

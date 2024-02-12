@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { useForm } from 'react-hook-form'
+import { set, useForm } from 'react-hook-form'
 import "../App.css"
 import { useEffect } from 'react'
 import { toggleModal, toggleSuccess } from '../store/modalSlice'
 import Loading from "./Loading"
+import Modal from "./Modal"
+import ProfileDetails from './ProfileDetails'
 import { toggleloggedin } from '../store/authSlice'
 function Profile() {
     const [loading, setLoading] = useState(false);
@@ -17,18 +19,21 @@ function Profile() {
     const [error, setError] = useState("")
     const [success, setSuccess] = useState("")
     const [editable, setEditable] = useState(false);
+    const [imgeditable, setimgeditable] = useState(false);
     const navigate = useNavigate()
-    const { register, handleSubmit, setValue } = useForm();
+    const { register, handleSubmit, setValue, reset } = useForm();
     const dispatch = useDispatch();
     const modal = useSelector((state) => state.modal.modal)
     const { id } = useParams();
     const theme = useSelector((state) => state.theme.mode);
     let homeClassName = 'bg-white';
     let inputClassName = 'bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none';
+    let avatarClassName = 'w-24 h-24 bg-white rounded-full p-3 absolute sm:-bottom-14 -bottom-10 left-0';
 
     if (theme === 'dark') {
         homeClassName += ' dark:bg-gray-950';
         inputClassName += ' dark:bg-gray-900';
+        avatarClassName = 'w-24 h-24 rounded-full p-3 absolute sm:-bottom-14 -bottom-10 left-0';
         // headingClassName += ' dark:text-white';
     }
     const handleclick = () => {
@@ -64,7 +69,9 @@ function Profile() {
             setShowMessage(true);
             const timer = setTimeout(() => {
                 setShowMessage(false);
-            }, 5000); // Change this value to adjust the time
+                setError("");
+                setSuccess("")
+            }, 3000); // Change this value to adjust the time
 
             return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
         }
@@ -105,7 +112,7 @@ function Profile() {
             if (!userData.ok) {
                 const error = await userData.json();
                 setError(error.error.message);
-                setEditable(!editable);
+                // setEditable(!editable);
                 setLoading(false);
                 return;
             }
@@ -137,6 +144,34 @@ function Profile() {
             setError(error.message);
         }
     }
+    const updatePassword = async (data) => {
+        setError("");
+        setSuccess("");
+        try {
+            setLoading(true);
+            const { oldPassword, newPassword, confirmpassword } = data;
+            const payload = { oldPassword, newPassword, confirmpassword };
+            const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/users/change-password`, {
+                method: "PATCH",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                const error = await response.json();
+                setError(error.error.message);
+                setLoading(false);
+                return;
+            }
+            setLoading(false);
+            setSuccess("Password updated successfully");
+            // setIsPasswordChange(false) somehow i want to change this state to false but how???
+        } catch (error) {
+            setError(error.message);
+        }
+    }
     return (
         <section className={homeClassName}>
             <div className={`flex flex-col items-center ${loading ? 'loading' : ''}`}>
@@ -148,7 +183,7 @@ function Profile() {
                         <div className="w-full h-full">
                             <img className="w-full h-full" src={coverImageUrl} alt="avatar" />
                         </div>
-                        <div className="w-24 h-24 bg-white rounded-full p-3 absolute sm:-bottom-14 -bottom-10 left-0" style={{ width: '11rem', height: '10rem' }}>
+                        <div className={avatarClassName} style={{ width: '11rem', height: '10rem' }}>
                             <img className="w-full h-full rounded-full" src={avatarUrl} alt="avatar" />
                         </div>
                         {editable && <div className=' bg-green-600 hover:bg-amber-600 p-3 rounded-full drop-shadow-md absolute sm:bottom-6 -bottom-10 right-6 cursor-pointer'>
@@ -177,101 +212,19 @@ function Profile() {
                             </svg>
                             <span className="text-white">Delete Account</span>
                         </span>}
-                        {modal && <div
-                            data-te-modal-init
-                            className="fixed left-0 top-0 z-[1055] h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-                            id="exampleModalCenter"
-                            tabindex="-1"
-                            aria-labelledby="exampleModalCenterTitle"
-                            aria-modal="true"
-                            role="dialog">
-                            <div
-                                data-te-modal-dialog-ref
-                                className="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                                <div
-                                    className="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-white shadow-lg outline-none dark:bg-gray-900">
-                                    <div
-                                        className="flex flex-shrink-0 items-center justify-end rounded-t-md border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
-                                        <button
-                                            type="button"
-                                            onClick={handlemodal}
-                                            className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
-                                            data-te-modal-dismiss
-                                            aria-label="Close">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke-width="1.5"
-                                                stroke="currentColor"
-                                                className="h-6 w-6">
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <div className="relative p-4">
-                                        <p>Are You Sure You Want To Delete Your Accoutn. You Wont Be Able To Get It Back!</p>
-                                    </div>
-                                    <div
-                                        className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
-                                        <button
-                                            type="button"
-                                            onClick={deleteAccount}
-                                            className="ml-1 inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
-                                            data-te-ripple-init
-                                            data-te-ripple-color="light">
-                                            Yes
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        }
+                        {modal && <Modal handlemodal={handlemodal} deleteAccount={deleteAccount} />}
                     </div>
                     <div className="flex items-center w-full max-w-4xl p-8">
-                        <div className="w-full pt-10">
-                            <div style={{ height: '40px' }}>
-                                {showMessage && error && <p className="text-red-600 text-center">{error}</p>}
-                                {showMessage && success && <p className="text-green-600 text-center">{success}</p>}
-                            </div>
-                            <div>
-                                <label className="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
-                                <input className={inputClassName} type="text" readOnly={!editable} {...register("fullname")} />
-                            </div>
-
-                            <div>
-                                <label className="block text-gray-700 text-sm font-bold mt-4 mb-2">Email</label>
-                                <input className={inputClassName} type="email" readOnly={!editable} {...register("email")} />
-                            </div>
-
-                            <div>
-                                <label className="block text-gray-700 text-sm font-bold mt-4 mb-2">Username</label>
-                                <input className={inputClassName} type="text" readOnly={!editable} {...register("username")} />
-                            </div>
-                            {editable && <button
-                                className="flex items-center justify-between px-6 py-3 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 mt-4" onClick={handleSubmit(update)}>
-                                <span>Save Changes</span>
-
-                                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 rtl:-scale-x-100" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd"
-                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                        clipRule="evenodd" />
-                                </svg>
-                            </button>}
-                            {!editable && <button
-                                className="flex items-center justify-between px-6 py-3 text-sm tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50 mt-4" onClick={handleclick}>
-                                <span>Edit Profile</span>
-
-                                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 rtl:-scale-x-100" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd"
-                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                        clipRule="evenodd" />
-                                </svg>
-                            </button>}
-                        </div>
+                        <ProfileDetails editable={editable}
+                            register={register}
+                            handleSubmit={handleSubmit}
+                            update={update}
+                            updatePassword={updatePassword}
+                            handleclick={handleclick}
+                            showMessage={showMessage}
+                            error={error}
+                            success={success}
+                            inputClassName={inputClassName} />
                     </div>
                 </form>
             </div>
