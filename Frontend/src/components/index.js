@@ -13,6 +13,7 @@ import PostCard from "./PostCard";
 import AuthLayout from "./AuthLayout";
 import Input from "./Input";
 import Profile from './Profile'
+import ResetPassword from './ResetPassword'
 export {
     Header,
     Footer,
@@ -28,5 +29,6 @@ export {
     AuthLayout, 
     Input,
     Select,
-    Profile
+    Profile,
+    ResetPassword
 }

@@ -459,17 +459,32 @@ const forgotPassword = asyncHandler(async (req, res) => {
         const error = new ApiError(400, "User Does Not Exist");
         return res.status(error.statusCode).json(error.toResponse());
     }
-    const resetPassWordToken = user.generatePasswordRefreshToken();
+    const resetPassWordToken = await user.generatePasswordRefreshToken();
     await user.save({ ValidateBeforeSave: false })
     // const resetPasswordUrl = `${req.protocol}://${req.get(
     //     'host'
     // )}/api/v1/users/reset-password/${resetPassWordToken}`;
-    // const message = `Your Password Reset Token: ${resetPasswordUrl}\n\nIf you have not requested to reset your password, please ignore this email. Have a nice day!`;
-    const message = `Your Password Reset Token: ${resetPassWordToken}\n\nIf you have not requested to reset your password, please ignore this email. Have a nice day!`;
+    const resetUrl = `http://localhost/reset-password`;
+
+    const subject = 'Password Reset Request';
+//     const text = `
+//     // Hello,
+
+//     // We received a request to reset your password.Your Reset Password Token Is ${resetPassWordToken} Click the link below to choose a new password:
+
+//     // ${resetUrl}
+
+//     // If you did not request this change, you can safely ignore this email. The link will expire in 1 hour.
+
+//     // Best,
+//     // Your Website Team
+//   `;
+    const message = `Your Password Reset Token: ${resetPassWordToken}\n\n and the link is ${resetUrl}If you have not requested to reset your password, please ignore this email. Have a nice day!`;
+    // const message = `Your Password Reset Token: ${resetPassWordToken}\n\nIf you have not requested to reset your password, please ignore this email. Have a nice day!`;
     try {
         await sendmail({
             email: user.email,
-            subject: "Password Reset Request",
+            subject,
             message
         });
         return res.status(200).json(
@@ -484,7 +499,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     }
 })
 
-const resetPassword = asyncHandler(async (req, res) => {
+const verifyPasswordResetToken = asyncHandler(async (req, res) => {
     const user = await User.findOne({
         passwordRefreshToken: req.params.token,
         passwordResetTokenExpiry: { $gt: Date.now() },
@@ -493,7 +508,21 @@ const resetPassword = asyncHandler(async (req, res) => {
         const error = new ApiError(408, "User Does not exists or the token is expired")
         return res.status(error.statusCode).json(error.toResponse());
     }
+    await user.save({ ValidateBeforeSave: false });
+    return res.status(200).json(
+        new ApiResponse(200, {}, "Token Verified Successfully")
+    )
+})
 
+const resetPassword = asyncHandler(async (req, res) => {
+    const user = await User.findOne({
+        passwordRefreshToken: req.params.token,
+        passwordResetTokenExpiry: { $gt: Date.now() },
+    });
+    if (!user) {
+        const error = new ApiError(400, "User Does Not Exist");
+        return res.status(error.statusCode).json(error.toResponse());
+    }
     if (req.body.password !== req.body.confirmpassword) {
         const error = new ApiError(408, "Passwords Do not match")
         return res.status(error.statusCode).json(error.toResponse());
@@ -508,4 +537,4 @@ const resetPassword = asyncHandler(async (req, res) => {
     )
 });
 
-export { registerUser, loginUser, logoutUser, refereshAccessToken, changeCurrentPassword, getCurrentUser, upDateUserDetails, updateUserAvatar, updateUserCoverImage, getUserProfile, deleteUserAccount, forgotPassword, resetPassword };
+export { registerUser, loginUser, logoutUser, refereshAccessToken, changeCurrentPassword, getCurrentUser, upDateUserDetails, updateUserAvatar, updateUserCoverImage, getUserProfile, deleteUserAccount, forgotPassword, resetPassword, verifyPasswordResetToken };

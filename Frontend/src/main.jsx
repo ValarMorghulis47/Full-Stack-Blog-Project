@@ -17,7 +17,7 @@ import Post from "./pages/Post";
 
 import MyPosts from "./pages/MyPosts.jsx";
 import Profile from './pages/Profile.jsx'
-
+import ResetPassword from './pages/ResetPassword.jsx'
 const router = createBrowserRouter([
     {
         path: "/",
@@ -72,11 +72,25 @@ const router = createBrowserRouter([
             },
             {
                 path: "/post/:slug",
-                element: <Post />,
+                element: (
+                    <AuthLayout authentication>
+                        {" "}
+                        <Post />,
+                    </AuthLayout>
+                )
             },
             {
                 path: "/profile/:username/:id",
-                element: <Profile />
+                element: (
+                    <AuthLayout authentication>
+                        {" "}
+                        <Profile />
+                    </AuthLayout>)
+            },
+            {
+                path: "/reset-password",
+                element: 
+                        <ResetPassword />
             }
         ],
     },

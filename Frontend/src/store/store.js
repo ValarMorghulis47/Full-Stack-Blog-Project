@@ -3,12 +3,14 @@ import authSlice from './authSlice';
 import postSlice from './postSlice';
 import darkmodeSlice from './darkmodeSlice';
 import modalSlice from './modalSlice';
+import resetPassSlice from './resetPassSlice';
 const store = configureStore({
     reducer: {
         auth : authSlice,
         post : postSlice,
         theme :darkmodeSlice,
-        modal : modalSlice
+        modal : modalSlice,
+        resetPass: resetPassSlice
     }
 });
 

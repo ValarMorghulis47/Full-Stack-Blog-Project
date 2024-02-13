@@ -15,7 +15,7 @@ const sendmail = async (options)=>{
             from: "Blog Development Team",
             to: options.email,
             subject: options.subject,
-            // html: options.html //we can also send html
+            // html: options.message //we can also send html
             text: options.message
         }
         await transport.sendMail(emailoptions)
