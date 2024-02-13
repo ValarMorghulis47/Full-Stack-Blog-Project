@@ -17,9 +17,9 @@
 
 import React from 'react'
 
-function Button({onClick, children, type = "button", className = "", ...props}) {
+function Button({onClick, children, type = "button", className = "", bgcolor= " bg-blue-600", ...props}) {
   return (
-    <button onClick={onClick} className={`${className}`} type={`${type}`} {...props}>
+    <button onClick={onClick} className={`px-4 py-2 rounded-lg ${className+ bgcolor}`} type={`${type}`} {...props}>
       {children}
     </button>
   )
