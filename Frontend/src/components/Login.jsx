@@ -89,18 +89,28 @@ function Login() {
         }
     }
     useEffect(() => {
-        if (error || success || resetSuccess) {
+        if (resetSuccess) {
             setShowMessage(true);
             const timer = setTimeout(() => {
                 setShowMessage(false);
-                setError("");
-                setSuccess("");
                 dispatch(toggleresetPassSuccess());
             }, 3000); // Change this value to adjust the time
 
             return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
         }
-    }, [error, success, resetSuccess]);
+    }, [resetSuccess]);
+    useEffect(() => {
+        if (error || success) {
+            setShowMessage(true);
+            const timer = setTimeout(() => {
+                setShowMessage(false);
+                setError("");
+                setSuccess("");
+            }, 3000); // Change this value to adjust the time
+
+            return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
+        }
+    }, [error, success]);
     return (
         <div className={homeClassName}>
             {!emailComp && <form onSubmit={handleSubmit(login)} className={`${loading ? 'loading' : ''}`}>
