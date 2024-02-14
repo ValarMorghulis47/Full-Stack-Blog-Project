@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import '../App.css'
 import { Container, PostCard } from '../components'
+import { Next_Prev_Buttons } from '../components';
 import { useSelector, useDispatch } from 'react-redux';
 import Loading from '../components/Loading';
 import { useState } from 'react';
@@ -40,7 +41,7 @@ function Home() {
             const timer = setTimeout(() => {
                 setShowMessage(false);
                 dispatch(togglePostDelete());
-            }, 5000); // Change this value to adjust the time
+            }, 3000); // Change this value to adjust the time
 
             return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
         }
@@ -77,8 +78,8 @@ function Home() {
         return (
             <div className={homeClassName} >
                 <Container>
-                    <div className="flex flex-wrap main-container">
-                        <div className="p-7 w-full flex flex-col items-center">
+                    <div className="flex flex-wrap flex-col justify-between main-container container-height">
+                        <div className="p-7">
                             <div style={{ height: '40px' }}>
                                 {showMessage && successmesj && <p className="text-green-600 text-center">Your Account Has Been Deleted Successfully</p>}
                                 {showMessage && postDeleteMesj && <p className="text-green-600 text-center">Your Post Has Been Deleted Successfully</p>}
@@ -97,8 +98,8 @@ function Home() {
         return (
             <div className={homeClassName}>
                 <Container>
-                    <div className="flex flex-wrap">
-                        <div className="p-2 w-full flex flex-col items-center">
+                    <div className="flex flex-wrap flex-col justify-between main-container container-height">
+                        <div className="p-7">
                             <div style={{ height: '40px' }}>
                                 {showMessage && successmesj && <p className="text-green-600 text-center">Your Account Has Been Deleted Successfully</p>}
                                 {showMessage && postDeleteMesj && <p className="text-green-600 text-center">Your Post Has Been Deleted Successfully</p>}
@@ -115,23 +116,25 @@ function Home() {
     else {
         return (
             <div className={postClassName}>
-                <Container>
-                    <div className='flex flex-wrap'>
-                        <div style={{ height: '40px' }}>
+                <Container className='flex'>
+                    <div className='flex flex-wrap justify-evenly'>
+                        {/* <div style={{ height: '40px' }}>
                             {showMessage && successmesj && <p className="text-green-600 text-center">Your Account Has Been Deleted Successfully</p>}
                             {showMessage && postDeleteMesj && <p className="text-green-600 text-center">Your Post Has Been Deleted Successfully</p>}
-                        </div>
+                        </div> */}
                         {AllPosts?.map((post) => (
                             <div key={post._id} className='p-2 w-1/4'>
                                 <PostCard {...post} />
                             </div>
                         ))}
-                    </div>
-                    <div className="flex justify-center">
-                        <div className="spinner">
-                            {loading && <Loading />}
+                        <div className="flex mx-auto">
+                            <div className="spinner">
+                                {loading && <Loading />}
+                            </div>
                         </div>
                     </div>
+
+                    <Next_Prev_Buttons />
                 </Container>
             </div>
         )

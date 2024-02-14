@@ -14,6 +14,7 @@ import AuthLayout from "./AuthLayout";
 import Input from "./Input";
 import Profile from './Profile'
 import ResetPassword from './ResetPassword'
+import Next_Prev_Buttons from "./Next_Prev_Buttons";
 export {
     Header,
     Footer,
@@ -30,5 +31,6 @@ export {
     Input,
     Select,
     Profile,
-    ResetPassword
+    ResetPassword,
+    Next_Prev_Buttons
 }
