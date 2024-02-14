@@ -18,7 +18,6 @@ const modalSlice = createSlice({
         },
         togglePostDelete: (state) => {
             state.postDelete = !state.postDelete;
-            console.log("post delete toggled: ", state.postDelete);
         },
     },
 });

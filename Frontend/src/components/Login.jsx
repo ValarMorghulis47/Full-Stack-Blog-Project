@@ -63,7 +63,6 @@ function Login() {
         try {
             const {email} = data;
             const payload = {email};
-            console.log(payload);
             setLoading(true);
             const userData = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/users/forgot-password`, {
                 method: "POST",
@@ -86,7 +85,6 @@ function Login() {
             reset();
         } catch (error) {
             setError(error.message)
-            console.log(error.message);
             setLoading(false);
         }
     }

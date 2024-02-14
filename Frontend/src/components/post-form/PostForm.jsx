@@ -109,7 +109,6 @@ export default function PostForm({ post }) {
         dispatch(UserPost(userpost ? [postData.data, ...userpost] : [postData.data]));
         navigate(`/post/${postData.data._id}`);
       } catch (error) {
-        console.log(error);
         setError(error.message);
         setLoading(false);
       }

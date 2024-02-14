@@ -165,6 +165,9 @@ const getAllPosts = asyncHandler(async (req, res) => {
         sort.createdAt = 1;
     }
 
+    // Calculate total posts
+    const totalPosts = await Post.countDocuments(query);
+
     // Execute the query with pagination
     const Posts = await Post.find(query)
         .sort(sort)
@@ -178,7 +181,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
 
     // Return the result to the client
     return res.status(200).json(
-        new ApiResponse(200, Posts, "Posts Fetched Successfully")
+        new ApiResponse(200, { posts: Posts, totalPosts }, "Posts Fetched Successfully")
     );
 });
 

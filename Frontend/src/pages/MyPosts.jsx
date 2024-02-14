@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 import Loading from '../components/Loading';
 import "../App.css"
 function AllPosts() {
-    console.log("my post page mounted");
     const UserPosts = useSelector((state) => state.post.UserPost)
     const userData = useSelector((state) => state.auth.userData)
     const theme = useSelector((state) => state.theme.mode);
@@ -25,7 +24,6 @@ function AllPosts() {
         const fetchPosts = async () => {
             if (!UserPosts?.length) {
                 try {
-                    console.log("use effect of my post triggered");
                     setLoading(true);
                     const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/user/${userData._id}`, {
                         method: 'GET',

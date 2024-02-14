@@ -8,7 +8,9 @@ import { useState } from 'react';
 import { AllPost } from '../store/postSlice';
 import { togglePostDelete, toggleSuccess } from '../store/modalSlice';
 function Home() {
-    console.log("Home component rendering");
+    const postsPerPage = 1;
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const AllPosts = useSelector((state) => state.post.AllPost)
     const IsLoggedIn = useSelector((state) => state.auth.IsLoggedIn)
@@ -48,17 +50,17 @@ function Home() {
     }, [successmesj, postDeleteMesj]);
     useEffect(() => {
         const fetchPosts = async () => {
-            if (!AllPosts?.length) {
                 try {
-                    console.log("use effect of home triggered");
                     setLoading(true);
-                    const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/`, {
+                    const response = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/posts/?page=${currentPage}&&limit=${postsPerPage}`, {
                         method: 'GET',
                         credentials: 'include',
                     });
                     if (response.ok) {
                         const postsData = await response.json();
-                        dispatch(AllPost(postsData.data))
+                        const totalposts = postsData.data.totalPosts;
+                        setTotalPages(Math.ceil(totalposts / postsPerPage));
+                        dispatch(AllPost(postsData.data.posts))
                         setLoading(false);
                     }
                     else {
@@ -69,11 +71,16 @@ function Home() {
                     setLoading(false);
                     // console.error("Error fetching posts:", error);
                 }
-            }
-            setLoading(false);
         };
         fetchPosts();
-    }, [IsLoggedIn])
+    }, [IsLoggedIn, currentPage])
+    const goToNextPage = () => {
+        setCurrentPage(prevPageNumber => prevPageNumber + 1);
+    };
+
+    const goToPrevPage = () => {
+        setCurrentPage(prevPageNumber => Math.max(prevPageNumber - 1, 1));
+    };
     if (IsLoggedIn === false) {
         return (
             <div className={homeClassName} >
@@ -134,7 +141,7 @@ function Home() {
                         </div>
                     </div>
 
-                    <Next_Prev_Buttons />
+                    <Next_Prev_Buttons currentPage={currentPage} totalPages={totalPages} goToNextPage={goToNextPage} goToPrevPage={goToPrevPage}/>
                 </Container>
             </div>
         )

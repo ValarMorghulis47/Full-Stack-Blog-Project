@@ -64,6 +64,6 @@
     bottom: -50vh;
 }
 
-/* .main-content{
-    height: calc(100vh-15vh-15vh);
-} */
+button:disabled:hover {
+    cursor: default !important;
+  }
