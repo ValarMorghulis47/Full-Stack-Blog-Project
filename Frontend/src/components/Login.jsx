@@ -6,17 +6,18 @@ import { useDispatch, useSelector } from "react-redux"
 import { useForm } from "react-hook-form"
 import Loading from "./Loading"
 import "../App.css"
-import { toggleEmailComp, toggleresetPassComp } from '../store/resetPassSlice'
+import { toggleEmailComp, toggleresetPassComp, toggleresetPassSuccess } from '../store/resetPassSlice'
 function Login() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const { register, handleSubmit } = useForm()
+    const { register, handleSubmit, reset } = useForm()
     const [error, setError] = useState("")
     const [success, setSuccess] = useState("")
     const [loading, setLoading] = useState(false);
     const [showMessage, setShowMessage] = useState(true);
     const theme = useSelector((state) => state.theme.mode);
     const emailComp = useSelector((state) => state.resetPass.emailComp);
+    const resetSuccess = useSelector((state) => state.resetPass.resetPassSuccess);
     let homeClassName = 'py-16 height';
     let inputClassName = 'bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none';
     // let headingClassName = 'text-2xl font-bold hover:text-gray-500';
@@ -60,7 +61,6 @@ function Login() {
     const sendEmail = async (data) => {
         setError("")
         try {
-            console.log(data.email);
             const {email} = data;
             const payload = {email};
             console.log(payload);
@@ -80,10 +80,10 @@ function Login() {
                 setLoading(false);
                 return;
             }
-            console.log("ok");
             setSuccess("Email sent successfully");
             setLoading(false);
             dispatch(toggleresetPassComp());
+            reset();
         } catch (error) {
             setError(error.message)
             console.log(error.message);
@@ -91,20 +91,25 @@ function Login() {
         }
     }
     useEffect(() => {
-        if (error || success) {
+        if (error || success || resetSuccess) {
             setShowMessage(true);
             const timer = setTimeout(() => {
                 setShowMessage(false);
+                setError("");
+                setSuccess("");
+                dispatch(toggleresetPassSuccess());
             }, 3000); // Change this value to adjust the time
 
             return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes
         }
-    }, [error, success]);
+    }, [error, success, resetSuccess]);
     return (
         <div className={homeClassName}>
             {!emailComp && <form onSubmit={handleSubmit(login)} className={`${loading ? 'loading' : ''}`}>
                 <div style={{ height: '40px' }}>
                     {showMessage && error && <p className="text-red-600 text-center">{error}</p>}
+                    {showMessage && success && <p className="text-green-600 text-center">{success}</p>}
+                    {showMessage && resetSuccess && <p className="text-green-600 text-center">Password Reset Successfully. You Can Login Now.</p>}
                 </div>
                 <div className="flex overflow-hidden mx-auto max-w-sm lg:max-w-4xl items-center justify-center">
                     <div className="spinner">

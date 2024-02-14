@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useForm } from "react-hook-form"
 import Loading from "./Loading"
 import "../App.css"
-import { toggleEmailComp, toggleresetPassComp } from '../store/resetPassSlice'
+import { toggleEmailComp, toggleresetPassComp, toggleresetPassSuccess } from '../store/resetPassSlice'
 function ResetPassword() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -29,9 +29,7 @@ function ResetPassword() {
     const resetPassword = async (data) => {
         setError("")
         try {
-            console.log(data)
             const token = data.token;
-            console.log(token);
             const {password , confirmpassword} = data;
             const payload = {password , confirmpassword}
             setLoading(true);
@@ -50,9 +48,11 @@ function ResetPassword() {
                 setLoading(false);
                 return;
             }
-            setSuccess("Password reset successfully");
+            setSuccess("Password reset successfully. You can now login.");
             setLoading(false);
             reset();
+            dispatch(toggleresetPassSuccess());
+            navigate("/login");
         } catch (error) {
             setError(error.message)
             setLoading(false);
@@ -90,6 +90,8 @@ function ResetPassword() {
             setShowMessage(true);
             const timer = setTimeout(() => {
                 setShowMessage(false);
+                setSuccess("");
+                setError("");
             }, 3000); // Change this value to adjust the time
 
             return () => clearTimeout(timer); // This will clear the timer if the component unmounts before the timer finishes

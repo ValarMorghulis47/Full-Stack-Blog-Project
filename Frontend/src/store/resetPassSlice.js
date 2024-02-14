@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     emailComp: false,
     resetPassComp: true,
+    resetPassSuccess: false,
 };
 
 const modalSlice = createSlice({
@@ -14,11 +15,13 @@ const modalSlice = createSlice({
         },
         toggleresetPassComp: (state) => {
             state.resetPassComp = !state.resetPassComp;
-            console.log("ive switched the state");
         },
+        toggleresetPassSuccess: (state) => {
+            state.resetPassSuccess = !state.resetPassSuccess;
+        }
     },
 });
 
-export const { toggleEmailComp, toggleresetPassComp} = modalSlice.actions;
+export const { toggleEmailComp, toggleresetPassComp, toggleresetPassSuccess} = modalSlice.actions;
 
 export default modalSlice.reducer;

@@ -101,8 +101,6 @@ function Profile() {
             if (data?.avatar[0]) {
                 formData.append('avatar', data.avatar[0]);
             }
-
-
             const userData = await fetch(`${import.meta.env.VITE_BASE_URI}/api/v1/users/update-account`, {
                 method: "PATCH",
                 body: formData,
