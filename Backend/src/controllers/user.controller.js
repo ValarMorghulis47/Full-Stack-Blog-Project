@@ -433,13 +433,26 @@ const deleteUserAccount = asyncHandler(async (req, res) => {
     }
     // Delete user's posts and their images
     const posts = await Post.find({ author: req.user?._id });
-    for (const post of posts) {
-        const postImagePublicId = post.imagePublicId;
-        const postImageFolder = "post";
-        if (postImagePublicId) {
-            await DeleteFileCloudinary(postImagePublicId, postImageFolder);
-        }
+    if (posts?.length) {
+        posts.forEach(async (post) => {
+            const postImagePublicId = post.imagePublicId;
+            const postImageFolder = "post";
+            if (postImagePublicId) {
+                await DeleteFileCloudinary(postImagePublicId, postImageFolder);
+            }
+        });
     }
+    // The method written below is also correct but we dont need async because for of loop does not gives us callback functions. THe loops that gives us callback functions we need to use the async keyword.
+    // const posts = await Post.find({ author: req.user?._id });
+    // if (posts?.length) {
+    // for (const post of posts) {
+    //     const postImagePublicId = post.imagePublicId;
+    //     const postImageFolder = "post";
+    //     if (postImagePublicId) {
+    //         await DeleteFileCloudinary(postImagePublicId, postImageFolder);
+    //     }
+    // }
+    // }
     await Post.deleteMany({ author: req.user?._id });
 
     await User.findByIdAndDelete(req.user?._id);
@@ -467,18 +480,18 @@ const forgotPassword = asyncHandler(async (req, res) => {
     const resetUrl = `http://localhost/reset-password`;
 
     const subject = 'Password Reset Request';
-//     const text = `
-//     // Hello,
+    //     const text = `
+    //     // Hello,
 
-//     // We received a request to reset your password.Your Reset Password Token Is ${resetPassWordToken} Click the link below to choose a new password:
+    //     // We received a request to reset your password.Your Reset Password Token Is ${resetPassWordToken} Click the link below to choose a new password:
 
-//     // ${resetUrl}
+    //     // ${resetUrl}
 
-//     // If you did not request this change, you can safely ignore this email. The link will expire in 1 hour.
+    //     // If you did not request this change, you can safely ignore this email. The link will expire in 1 hour.
 
-//     // Best,
-//     // Your Website Team
-//   `;
+    //     // Best,
+    //     // Your Website Team
+    //   `;
     const message = `Your Password Reset Token: ${resetPassWordToken}\n\n and the link is ${resetUrl}If you have not requested to reset your password, please ignore this email. Have a nice day!`;
     // const message = `Your Password Reset Token: ${resetPassWordToken}\n\nIf you have not requested to reset your password, please ignore this email. Have a nice day!`;
     try {
