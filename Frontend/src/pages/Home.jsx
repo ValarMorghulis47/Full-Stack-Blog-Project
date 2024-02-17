@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { AllPost } from '../store/postSlice';
 import { togglePostDelete, toggleSuccess } from '../store/modalSlice';
 function Home() {
-    const postsPerPage = 1;
+    const postsPerPage = 3;
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
