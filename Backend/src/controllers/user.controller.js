@@ -8,7 +8,7 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose"
 import { sendmail } from "../utils/SendEmail.js"
-
+import { ObjectId} from "bson"
 const generateTokens = async (userId) => {
     try {
         const user = await User.findById(userId)
@@ -376,7 +376,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
     const Profile = await User.aggregate([
         {
             $match: {
-                _id: new mongoose.Types.ObjectId(userId)
+                _id: new ObjectId(userId)
             },
         },
         {
