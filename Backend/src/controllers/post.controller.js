@@ -104,7 +104,7 @@ const getSinglePost = asyncHandler(async (req, res) => {
         [
             {
                 $match: {
-                    _id: new mongoose.Types.ObjectId(postId)
+                    _id: mongoose.Types.ObjectId.createFromHexString(postId)
                 }
             },
             {
@@ -191,7 +191,7 @@ const getUserPosts = asyncHandler(async (req, res) => {
         [
             {
                 $match: {
-                    author: new mongoose.Types.ObjectId(userId)
+                    author: mongoose.Types.ObjectId.createFromHexString(userId)
                 }
             },
             {
